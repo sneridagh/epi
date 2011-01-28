@@ -12,6 +12,8 @@ requires = [
     'repoze.tm2>=1.0b1', # default_commit_veto
     'ZODB3',
     'WebError',
+    'repoze.who',
+    'pyramid_who',
     ]
 
 setup(name='epi',
