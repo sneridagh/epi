@@ -14,6 +14,12 @@ requires = [
     'WebError',
     'repoze.who',
     'pyramid_who',
+    'pyramid_zcml',
+    'mechanize',
+    'BeautifulSoup',
+    'plone.memoize',
+    'zope.app.cache',
+    'DateTime',
     ]
 
 setup(name='epi',

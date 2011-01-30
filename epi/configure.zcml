@@ -1,0 +1,11 @@
+<configure xmlns="http://pylonshq.com/pyramid">
+    
+    <!-- this must be included for the view declarations to work -->
+    <include package="pyramid_zcml"/>
+
+    <utility
+    factory="epi.utilities.EPIUtility"
+    provides="epi.interfaces.IEPIUtility"
+    />
+    
+</configure>

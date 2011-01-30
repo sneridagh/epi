@@ -33,6 +33,11 @@
     <link type="text/css" href="css/deco.css" rel="stylesheet" />
     <link type="text/css" href="css/pyrenees.css" rel="stylesheet" />
 
+	<!-- CSS EPI -->
+    <link rel="stylesheet" type="text/css" href="css/epi.css" media="screen"/>
+    <link rel="stylesheet" type="text/css" href="js/fancybox/jquery.fancybox-1.3.1.css" media="screen" />
+    <link rel="stylesheet" type="text/css" href="css/jquery.autocomplete.css" media="screen" />
+
     <!-- Custom Font from Google Font Directory -->
     <link href='http://fonts.googleapis.com/css?family=Ubuntu:regular,italic,bold,bolditalic' rel='stylesheet' type='text/css' />
 
@@ -87,10 +92,16 @@
 
   <!--  JQuery TinyMCE -->
   <script src="js/tiny_mce/jquery.tinymce.js"></script>
-  
+
+  <!--  Varis JS de l'epi-->
+  <script type="text/javascript" src="js/fancybox/jquery.mousewheel-3.0.2.pack.js"></script>
+  <script type="text/javascript" src="js/fancybox/jquery.fancybox-1.3.1.js"></script>
+  <script type="text/javascript" src="js/libs/jquery.autocomplete.pack.js"></script>
+
   <!-- scripts concatenated and minified via ant build script-->
   <script src="js/plugins.js"></script>
   <script src="js/script.js"></script>
+  <script src="js/functions.js"></script>
   <!-- end concatenated and minified scripts-->
   
   

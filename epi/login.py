@@ -6,7 +6,7 @@ from pyramid.security import remember
 from pyramid.security import forget
 
 from urlparse import urljoin
-
+from epi.interfaces import IEPIUtility
 
 def _fixup_came_from(request, came_from):
     if came_from is None:
@@ -81,7 +81,12 @@ def login(context, request):
          remember_headers = auth_tkt.remember(request.environ, credentials)
         else:
          remember_headers = []
-
+        
+        # Quan entra, guardar les credencials a la utility
+        registry = request.registry
+        epiUtility=registry.getUtility(IEPIUtility)
+        epiUtility.setUserPassword(request, userid, password)
+        
         return HTTPFound(headers=remember_headers, location=came_from)
 
     response = dict(

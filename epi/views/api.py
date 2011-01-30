@@ -9,7 +9,7 @@ class TemplateAPI(object):
 
     @property
     def masterTemplate(self):
-        master = get_renderer('pyrenees:templates/master.pt').implementation()
+        master = get_renderer('epi:templates/master.pt').implementation()
         return master
     
     @property
@@ -20,7 +20,7 @@ class TemplateAPI(object):
     @property
     def snippets(self):
         if self._snippets is None:
-            self._snippets = get_renderer('pyrenees:templates/snippets.pt').implementation()
+            self._snippets = get_renderer('epi:templates/snippets.pt').implementation()
         return self._snippets
     
     _status_message = None

@@ -1,4 +1,6 @@
+# -*- coding: utf-8 -*-
 from pyramid.config import Configurator
+import pyramid_zcml
 
 from pyramid.session import UnencryptedCookieSessionFactoryConfig
 
@@ -7,6 +9,18 @@ from pyramid.authorization import ACLAuthorizationPolicy
 
 from repoze.zodbconn.finder import PersistentApplicationFinder
 from epi.models import appmaker
+
+EPI_OPTIONS = dict(descomptar_30=True,
+                   hores_diaries=7,
+                   dies_setmana=5
+
+                   )
+EPI_OPTIONS_TYPES = dict(descomptar_30='bool',
+                   hores_diaries='int',
+                   dies_setmana='int'
+                   )
+MONTH_NAMES = dict(January='Gener',February='Febrer',March='Març',April='Abril',May='Maig',June='Juny',July='Juliol',August='Agost',September='Setembre',October='Octubre',November='Novembre',December='Desembre')
+
 
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
@@ -34,6 +48,7 @@ def main(global_config, **settings):
     config.add_static_view('static', 'epi:static')
     config.add_static_view('css', 'epi:css')
     config.add_static_view('js', 'epi:js')
+    config.add_static_view('images', 'epi:images')
     
     config.add_route('login', '/login',
                      view='epi.login.login',
@@ -44,4 +59,8 @@ def main(global_config, **settings):
     config.add_route('logout', '/logout',
                      view='epi.login.logout')
     config.scan('epi')
+    config.include(pyramid_zcml)
+    zcml_file = settings.get('configure_zcml', 'configure.zcml')
+    config.load_zcml(zcml_file)
+    
     return config.make_wsgi_app()
