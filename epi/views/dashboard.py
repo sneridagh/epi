@@ -65,6 +65,10 @@ class dashboardView(BaseView):
         """
         self.context = context
         self.request = request
+        
+        registry = self.request.registry
+        self.epiUtility=registry.getUtility(IEPIUtility)
+        
         self.marcatges_avui = []
         now = DateTime()
         self.now = DateTimeToTT(now)
@@ -120,6 +124,7 @@ class dashboardView(BaseView):
 
         page_title = "%s Dashboard" % username
         api = TemplateAPI(self.context, self.request, page_title)
+        view = dashboardView(self.context, self.request)
         return dict(api = api)
 
     def getPreviousMonth(self,actual):
@@ -221,10 +226,13 @@ class dashboardView(BaseView):
     def getSetmanes(self):
         """
         """
+        registry = self.request.registry
+        epiUtility=registry.getUtility(IEPIUtility)
+        
         username,password = self.getAuthenticationToken()
         self.username = username
         self.password = password
-        self.options = self.context.portal_epi_data.getEPIOptions(username)
+        self.options = epiUtility.getEPIOptions(self.request, username)
         self.descompte_descans = self.options['descomptar_30'] and 30 or 0
 
         NUMSETMANES = 4
@@ -376,9 +384,9 @@ class dashboardView(BaseView):
         """
         t0 = time.time()
 
-        operacions = Operacions(self.username,self.password,self.eid,self.tid)
-        presencia = Presencia(self.username,self.password)
-        self.options = self.context.portal_epi_data.getEPIOptions(self.username)
+        operacions = Operacions(self.request, self.username,self.password,self.eid,self.tid)
+        presencia = Presencia(self.request, self.username,self.password)
+        self.options = self.epiUtility.getEPIOptions(self.request, self.username)
         descompte_descans = self.options['descomptar_30'] and 30 or 0
         hores_diaries = self.options['hores_diaries']
 
@@ -523,8 +531,8 @@ class dashboardView(BaseView):
 
 
 
-        self.context.portal_epi_data.saveLastAccessed(self.username,DateTime().ISO())
-        self.context.portal_epi_data.saveMarcadors(self.username,marcadors)
+        self.epiUtility.saveLastAccessed(self.username,DateTime().ISO())
+        self.epiUtility.saveMarcadors(self.username,marcadors)
         print "%.3f segons TOTAL" % (time.time()-t0)
         return dies
 

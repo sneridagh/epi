@@ -6,9 +6,15 @@
     <metal:main fill-slot="main">
       <div id="main">
 
-          <div metal:use-macro="api.snippets.macros['statusMessage']"/>
+        <div metal:use-macro="api.snippets.macros['statusMessage']"/>
 
+		<div id="ajaxWorking"></div>
+		<div id="board" tal:define="setmanes view.getSetmanes();">
+		    <div id="header">
+				<span tal:content="setmanes">asd</span>
 
+		    </div>
+		</div>
       </div>
   </metal:main>
 </body>

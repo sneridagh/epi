@@ -59,18 +59,20 @@ PERMISOS_HISTORIC_URL = '%s/presenciaH01%%s.nsf/VPermisos?OpenView&Start=1&Count
 class Presencia(object):
     """
     """
-    def __init__(self,username,password,context=''):
+    def __init__(self, request, username,password,context=''):
         """
         Al instanciar la classe, es loguejarà utilitzant el nom d'usuari i password proporcionats,
         Si browser_login conté algo són les cookies guardades de la última sessio loguejada que s'ha fet.
         Recarregarem les cookies en un Browser nou, i aixi estalviarà uns segons que consumiria del login.
         """
-
-        epitool = getUtility(IEPIUtility)
         self.context=context
+        self.request=request
+        registry = self.request.registry
+        self.epitool=registry.getUtility(IEPIUtility)
+
         self.username = username
         self.password = password
-        self.browser_login, elk = epitool.recoverBrowserSession(self.username,'presencia')
+        self.browser_login, elk = self.epitool.recoverBrowserSession(self.request, self.username,'presencia')
         if self.browser_login:
           self.br=Browser()
           self.br.set_handle_robots(False)
@@ -115,8 +117,7 @@ class Presencia(object):
     def saveSessionData(self):
         """
         """
-        epitool = getUtility(IEPIUtility)
-        epitool.saveBrowserSession(self.username,self.getBrowserSession(),'presencia')
+        self.epitool.saveBrowserSession(self.request, self.username,self.getBrowserSession(),'presencia')
         return
 
     def login(self,message = "Logging-in into presència via regular login"):

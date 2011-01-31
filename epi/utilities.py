@@ -43,13 +43,15 @@ class EPIUtility(object):
         userdata['password']=password
         persistentobj.storage[username]=userdata
 
-    def getEPIOptions(self,username):
+    def getEPIOptions(self, request, username):
         """
         """
+        persistentobj = self.get_storage(request)
+        
         options = EPI_OPTIONS
-        if self.storage.has_key(username)>0:
-          if self.storage[username].has_key('options'):
-            options = self.storage[username]['options']
+        if persistentobj.storage.has_key(username)>0:
+          if persistentobj.storage[username].has_key('options'):
+            options = persistentobj.storage[username]['options']
             #Refem el diccionari d'opcions per si n'haguessim afegit alguna al sistema
             #i el guarde,
             for option in EPI_OPTIONS.keys():
@@ -58,14 +60,16 @@ class EPIUtility(object):
                     self.setEPIOptions(username,options)
         return options
 
-    def setEPIOptions(self,username,options):
+    def setEPIOptions(self, request, username,options):
         """
         """
+        persistentobj = self.get_storage(request)
+        
         useroptions = OOBTree()
-        if self.storage.has_key(username)>0:
-            useroptions=self.storage[username]
+        if persistentobj.storage.has_key(username)>0:
+            useroptions=persistentobj.storage[username]
         useroptions['options']=options
-        self.storage[username]=useroptions
+        persistentobj.storage[username]=useroptions
 
     def getUserCodes(self, request, username):
         """
@@ -105,18 +109,20 @@ class EPIUtility(object):
                   elk = persistentobj.sessions[username]['externalLoginKey']
         return (browser,elk)
 
-    def saveBrowserSession(self,username,browser,web):
+    def saveBrowserSession(self, request, username,browser,web):
         """
         """
+        persistentobj = self.get_storage(request)
+        
         br,ELK = browser
-        if not self.sessions.has_key(username)>0:
-            self.sessions[username]=OOBTree()
-        if not self.sessions[username].has_key('browser'):
-            self.sessions[username]['browser']= {}
-        if web=='operacions' and not 'externalLoginKey' in self.sessions[username].keys():
-            self.sessions[username]['externalLoginKey']=ELK
-        self.sessions[username]['browser'][web]=br
-        self.sessions[username]._p_changed= 1
+        if not persistentobj.sessions.has_key(username)>0:
+            persistentobj.sessions[username]=OOBTree()
+        if not persistentobj.sessions[username].has_key('browser'):
+            persistentobj.sessions[username]['browser']= {}
+        if web=='operacions' and not 'externalLoginKey' in persistentobj.sessions[username].keys():
+            persistentobj.sessions[username]['externalLoginKey']=ELK
+        persistentobj.sessions[username]['browser'][web]=br
+        persistentobj.sessions[username]._p_changed= 1
 
     def saveLastAccessed(self,username,time_accessed):
         """
