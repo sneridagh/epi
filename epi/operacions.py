@@ -10,7 +10,7 @@ from epi.interfaces import IEPIUtility
 from zope.app.cache.interfaces.ram import IRAMCache
 from zope.component import getUtility
 import logging
-
+from beaker.cache import cache_region
 
 
 LOGIN_URL = 'https://maul.upc.es:8444/inici/control/main?idEmpresa=1123'
@@ -393,7 +393,8 @@ class Operacions(object):
 
     #@cache(smartCacheKey)
     #@reloginIfCrashedAndCache
-    def obtenirImputacions(self,di=None,df=None,fname='obtenirImputacions'):
+    @cache_region('default_term', 'obtenirImputacions')
+    def obtenirImputacions(self, username, di=None, df=None):
         """
         """
         self.reloadExternalLoginKey()

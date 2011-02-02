@@ -7,4 +7,6 @@
 *.db
 *.fs
 *.fs.*
+*.log
 passwd
+data

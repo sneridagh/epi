@@ -10,6 +10,7 @@ from zope.app.cache.interfaces.ram import IRAMCache
 from zope.component import getUtility
 from copy import deepcopy
 import logging
+from beaker.cache import cache_region
 
 MOTIUS_PERMISOS = {'Permis sense sou': {'compta_hores':False,'imatge': 'permis.jpg'},
 'Permís per estudis': {'compta_hores':True,'imatge': 'permis.jpg'},
@@ -280,7 +281,7 @@ class Presencia(object):
             dies = days_of_query_year
             dies.update(days_of_query_past_year)
         else:
-            dies = deepcopy(self.getPermisos(fname="getPermisos"))
+            dies = deepcopy(self.getPermisos(self.username))
             if self.now.month()<3:
                 #days_of_past_year = deepcopy(self.getPermisosHistoric(current_year-1,fname="getPermisosHistoric"))
                 #Vik: punt conflictiu import ipdb; ipdb.set_trace()
@@ -477,7 +478,8 @@ class Presencia(object):
         return self.getPermisosBase(PERMISOS_HISTORIC_URL % year)
 
     #@reloginIfCrashedAndCache
-    def getPermisos(self,fname='getPermisos'):
+    @cache_region('default_term', 'getPermisos')
+    def getPermisos(self, username):
         """
         """
         self.log("getPermisos")

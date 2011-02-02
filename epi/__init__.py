@@ -10,6 +10,9 @@ from pyramid_beaker import set_cache_regions_from_settings, session_factory_from
 from repoze.zodbconn.finder import PersistentApplicationFinder
 from epi.models import appmaker
 
+from beaker.util import parse_cache_config_options
+import beaker.cache
+
 EPI_OPTIONS = dict(descomptar_30=True,
                    hores_diaries=7,
                    dies_setmana=5
@@ -65,5 +68,8 @@ def main(global_config, **settings):
     config.include(pyramid_zcml)
     zcml_file = settings.get('configure_zcml', 'configure.zcml')
     config.load_zcml(zcml_file)
+    
+    cache_config=parse_cache_config_options(config.registry.settings)
+    beaker.cache.cache_regions.update(cache_config["cache_regions"])
     
     return config.make_wsgi_app()

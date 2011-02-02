@@ -19,7 +19,23 @@ from zope.app.cache.interfaces.ram import IRAMCache
 from zope.component import getUtility
 from copy import deepcopy
 
+from beaker.cache import cache_region, cache_regions
+
 @view_config(name="prova.html", renderer='epi:templates/mytemplate.pt')
+def unaltre(context, request):
+    # import ipdb; ipdb.set_trace()
+    page_title = getHola('svsdf')
+    #page_title = "%s Dashboard" % "prova"
+    api = TemplateAPI(context, request, page_title)
+    hola = getHola('asd')
+    return dict(api = api, project=page_title, hola=hola)  
+
+@cache_region('default_term', 'paquillo')
+def getHola(param):
+    print param
+    return 'True'
+
+@view_config(name="prova2.html", renderer='epi:templates/mytemplate.pt')
 class provaView(object):
 
     def  __init__(self,context,request):
@@ -27,12 +43,19 @@ class provaView(object):
         """
         self.context = context
         self.request = request
-        print "HOLA!"
+
     
     def __call__(self):
-        page_title = "%s Dashboard" % "prova"
+        # import ipdb; ipdb.set_trace()
+        page_title = self.getHola('svsdf')
+        #page_title = "%s Dashboard" % "prova"
         api = TemplateAPI(self.context, self.request, page_title)
-        return dict(api = api, project=page_title)
+        return dict(api = api, project=page_title, hola=self.getHola('asd'))
+    
+    @cache_region('default_term')
+    def getHola(self, param):
+        print param
+        return 'True'
 
 class BaseView(object):
     """ Classe base de totes les vistes
@@ -401,7 +424,7 @@ class dashboardView(BaseView):
         dates_range = [DateTimeToTT(di1+a) for a in range(0,daysBetweenDates(di1,di2)+1)]
 
         tm = time.time()
-        imputacions_entre_dates = operacions.obtenirImputacions(di=data_imputacio1,df=data_imputacio2,fname="obtenirImputacions")
+        imputacions_entre_dates = operacions.obtenirImputacions(self.username, data_imputacio1, data_imputacio2)
 
         self.tiquets = self.getImputacionsRecents(imputacions_entre_dates,'TI')
         self.problemes = self.getImputacionsRecents(imputacions_entre_dates,'PB')
