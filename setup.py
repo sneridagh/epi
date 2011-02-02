@@ -17,6 +17,7 @@ requires = [
     'pyramid_zcml',
     'mechanize',
     'BeautifulSoup',
+    'pyramid_beaker',
     'plone.memoize',
     'zope.app.cache',
     'DateTime',

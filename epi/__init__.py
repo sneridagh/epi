@@ -2,10 +2,10 @@
 from pyramid.config import Configurator
 import pyramid_zcml
 
-from pyramid.session import UnencryptedCookieSessionFactoryConfig
-
 from pyramid_who.whov2 import WhoV2AuthenticationPolicy
 from pyramid.authorization import ACLAuthorizationPolicy
+
+from pyramid_beaker import set_cache_regions_from_settings, session_factory_from_settings
 
 from repoze.zodbconn.finder import PersistentApplicationFinder
 from epi.models import appmaker
@@ -25,12 +25,14 @@ MONTH_NAMES = dict(January='Gener',February='Febrer',March='Març',April='Abril'
 def main(global_config, **settings):
     """ This function returns a Pyramid WSGI application.
     """
-    my_session_factory = UnencryptedCookieSessionFactoryConfig('itsaseekreet')
-
+    session_factory = session_factory_from_settings(settings)
+    
     whoconfig_file = 'who.ini'
     identifier_id = 'auth_tkt'
     authn_policy = WhoV2AuthenticationPolicy(whoconfig_file, identifier_id)
     authz_policy = ACLAuthorizationPolicy()    
+    
+    set_cache_regions_from_settings(settings)
     
     zodb_uri = settings.get('zodb_uri')
     if zodb_uri is None:
@@ -41,9 +43,10 @@ def main(global_config, **settings):
         return finder(request.environ)
     config = Configurator(root_factory=get_root,
                           settings=settings,
-                          session_factory = my_session_factory,
                           authentication_policy=authn_policy,
                           authorization_policy=authz_policy)
+    
+    config.set_session_factory(session_factory)
     
     config.add_static_view('static', 'epi:static')
     config.add_static_view('css', 'epi:css')
