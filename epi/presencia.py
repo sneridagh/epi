@@ -158,7 +158,7 @@ class Presencia(object):
         return True
         print "S'ha canviat l'estat de marcatge"
 
-    @reloginIfCrashedAndCache
+    ##@reloginIfCrashedAndCache
     def getMarcatgesHistoric(self,year,fname='getMarcatgesHistoric'):
         """
         Recupera la pàgina de marcatges de presència de l'històric anual, on hi ha tot el que no surt a la pagina principal
@@ -167,7 +167,7 @@ class Presencia(object):
         self.log("getMarcatges Historic %s" % year)
         return self.getMarcatgesBase(MARCATGES_HISTORIC_URL % year,year=int(year))
 
-    @reloginIfCrashedAndCache
+    ##@reloginIfCrashedAndCache
     def getMarcatges(self,fname='getMarcatges'):
         """
         Recupera la pàgina de marcatges de presència, on hi han els dos ultims mesos de marcatges.
@@ -270,15 +270,20 @@ class Presencia(object):
         historic_query_year = kwargs.get('year',None)        
         is_historic_query = historic_query_year!=None
 
+        # Vik: Mocking days_of_past_year
+        days_of_past_year = {('28', '01', '2011'): {'total': 0, 'permisos': [{'image': 'teletreball.jpg', 'minutes': 420, 'compta_hores': False, 'title': 'Teletreball'}], 'link_marcatge': '', 'marcatges': []}, ('19', '01', '2011'): {'total': 0, 'permisos': [{'image': 'teletreball.jpg', 'minutes': 420, 'compta_hores': False, 'title': 'Teletreball'}], 'link_marcatge': '', 'marcatges': []}}
+
         if is_historic_query:
-            days_of_query_year = current_year==historic_query_year and deepcopy(self.getPermisos(fname="getPermisos")) or deepcopy(self.getPermisosHistoric(historic_query_year,fname="getPermisosHistoric"))
-            days_of_query_past_year = deepcopy(self.getPermisosHistoric(historic_query_year-1,fname="getPermisosHistoric"))
+            days_of_query_year = current_year==historic_query_year # and deepcopy(self.getPermisos(fname="getPermisos")) or deepcopy(self.getPermisosHistoric(historic_query_year,fname="getPermisosHistoric"))
+            # Vik: treure l'ultim any
+            #days_of_query_past_year = deepcopy(self.getPermisosHistoric(historic_query_year-1,fname="getPermisosHistoric"))
             dies = days_of_query_year
             dies.update(days_of_query_past_year)
         else:
             dies = deepcopy(self.getPermisos(fname="getPermisos"))
             if self.now.month()<3:
-                days_of_past_year = deepcopy(self.getPermisosHistoric(current_year-1,fname="getPermisosHistoric"))
+                #days_of_past_year = deepcopy(self.getPermisosHistoric(current_year-1,fname="getPermisosHistoric"))
+                #Vik: punt conflictiu import ipdb; ipdb.set_trace()
                 dies.update(days_of_past_year)
             
             
@@ -397,7 +402,7 @@ class Presencia(object):
         else:
             return (None,None)
 
-    @reloginIfCrashedAndCache
+    ##@reloginIfCrashedAndCache
     def getPresencia(self,fname='getPresencia'):
         """
         Recupera la pàgina de persones de presència, on hi han els telèfons de cadascú i si esta o no presents
@@ -464,14 +469,14 @@ class Presencia(object):
 
         return dict(nom=nom,online=online,intern=telefon_intern,mobil=telefon_mobil,public=telefon_public)
 
-    @reloginIfCrashedAndCache
+    #@reloginIfCrashedAndCache
     def getPermisosHistoric(self,year,fname='getPermisosHistoric'):
         """
         """
         self.log("getPermisos Historic %s" % year)
         return self.getPermisosBase(PERMISOS_HISTORIC_URL % year)
 
-    @reloginIfCrashedAndCache
+    #@reloginIfCrashedAndCache
     def getPermisos(self,fname='getPermisos'):
         """
         """

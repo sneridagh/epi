@@ -14,11 +14,25 @@ import time
 from DateTime import DateTime
 from epi.dateutils import *
 from epi import MONTH_NAMES
-from BTrees.OOBTree import OOBTree
 
 from zope.app.cache.interfaces.ram import IRAMCache
 from zope.component import getUtility
 from copy import deepcopy
+
+@view_config(name="prova.html", renderer='epi:templates/mytemplate.pt')
+class provaView(object):
+
+    def  __init__(self,context,request):
+        """
+        """
+        self.context = context
+        self.request = request
+        print "HOLA!"
+    
+    def __call__(self):
+        page_title = "%s Dashboard" % "prova"
+        api = TemplateAPI(self.context, self.request, page_title)
+        return dict(api = api, project=page_title)
 
 class BaseView(object):
     """ Classe base de totes les vistes
@@ -57,7 +71,7 @@ class BaseView(object):
         """
         return [dict(title=a,image=MOTIUS[a]['imatge']) for a in MOTIUS.keys()]
 
-@view_config(context=Root, renderer='epi:templates/dashboard.pt')
+@view_config(context=Root, renderer='epi:templates/dashboard.pt', permission='view')
 class dashboardView(BaseView):
 
     def  __init__(self,context,request):
@@ -66,65 +80,42 @@ class dashboardView(BaseView):
         self.context = context
         self.request = request
         
+        # Faig la utility disponible com atribit de la classe mare
         registry = self.request.registry
         self.epiUtility=registry.getUtility(IEPIUtility)
+        
+        self.username, self.password = self.getAuthenticationToken()
+        
+        #Si estem identificats, comprovem que tinguem els codis d'usuari del gestor
+        # sino, inicialitzem Operacions i seguidament els agafem i els guardem
+        if self.eid==None or self.tid==None:
+             operacions = Operacions(self.request, self.username, self.password)
+             #Si inicialitzem operacions correctament, obtenim el codi d'usuari i els guardem
+             if operacions.initialized:
+                 self.eid, self.tid = operacions.obtenirCodisUsuari()
+                 self.epiUtility.setUserCodes(self.request, self.username, self.eid, self.tid)
+    
+                 operacions.closeBrowser()
         
         self.marcatges_avui = []
         now = DateTime()
         self.now = DateTimeToTT(now)
+        #import ipdb; ipdb.set_trace()
         # if self.request.get('relogin',False):
         #     self.portal_epi_data.sessions=OOBTree()
 
     def __call__(self):
         """
         """
-        registry = self.request.registry
-        epiUtility=registry.getUtility(IEPIUtility)
         
-        # portal_url = self.context.portal_url.getPortalObject().absolute_url()
-        username, password = self.getAuthenticationToken()
-        # 
         # #Esborrem la cache si hem clicat al logo de l'epi
         # if self.request.get('refresh',False):
         #     self.invalidateAll()
         #     self.request.response.redirect(portal_url)
         #     return
-        # 
-        # #No estem identificats
-        # if username==None:
-        #     self.request.response.redirect(portal_url+'/login_form')
-        #     return ''
-        # else:
-        # .....>
-        #Si estem identificats, comprovem que tinguem els codis d'usuari del gestor
-        # sino, els agafem i els guardem
-        eid,tid = epiUtility.getUserCodes(self.request, username)
-        if eid==None or tid==None:
-             operacions = Operacions(self.request, username,password)
-             #Si no podem inicialitzar operacions tornarem a demanar que es logini
-             #podria ser que estiguessim logats com a admin...
-             if operacions.initialized:
-                 eid,tid = operacions.obtenirCodisUsuari()
-                 epiUtility.setUserCodes(self.request,username,eid,tid)
-    
-                 operacions.closeBrowser()
-        # Pasant d'aquesta part.
-             # else:
-             #     self.request.response.redirect(portal_url+'/login_form')
-             #     
-             #     operacions.closeBrowser()
-             #     return ''
-        # i d'aquesta...
-        # template_name = 'iphone' in self.request.get('HTTP_USER_AGENT','').lower() and 'iphone-board.pt' or 'vista-setmana.pt'
-        # self.template = ViewPageTemplateFile(template_name)
-        # try:
-        #     return self.template()
-        # except URLError:
-        #     self.request.response.redirect('http://epi.beta.upcnet.es/errors/111.html')
 
-        page_title = "%s Dashboard" % username
+        page_title = "%s Dashboard" % self.username
         api = TemplateAPI(self.context, self.request, page_title)
-        view = dashboardView(self.context, self.request)
         return dict(api = api)
 
     def getPreviousMonth(self,actual):
@@ -226,13 +217,7 @@ class dashboardView(BaseView):
     def getSetmanes(self):
         """
         """
-        registry = self.request.registry
-        epiUtility=registry.getUtility(IEPIUtility)
-        
-        username,password = self.getAuthenticationToken()
-        self.username = username
-        self.password = password
-        self.options = epiUtility.getEPIOptions(self.request, username)
+        self.options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = self.options['descomptar_30'] and 30 or 0
 
         NUMSETMANES = 4
@@ -385,6 +370,7 @@ class dashboardView(BaseView):
         t0 = time.time()
 
         operacions = Operacions(self.request, self.username,self.password,self.eid,self.tid)
+        # Vik: Aqui inicialitza per primera vegada presencia
         presencia = Presencia(self.request, self.username,self.password)
         self.options = self.epiUtility.getEPIOptions(self.request, self.username)
         descompte_descans = self.options['descomptar_30'] and 30 or 0
@@ -531,8 +517,8 @@ class dashboardView(BaseView):
 
 
 
-        self.epiUtility.saveLastAccessed(self.username,DateTime().ISO())
-        self.epiUtility.saveMarcadors(self.username,marcadors)
+        self.epiUtility.saveLastAccessed(self.request, self.username,DateTime().ISO())
+        self.epiUtility.saveMarcadors(self.request, self.username,marcadors)
         print "%.3f segons TOTAL" % (time.time()-t0)
         return dies
 
@@ -596,3 +582,11 @@ class dashboardView(BaseView):
                 afegits.append(tiquetId)
                 filtrades.append(dict(requirementId=tiquetId,title=imp['referencia']))
         return filtrades
+
+    def getPresenciaStatus(self):
+        """
+        """
+        if self.presenciaStatus=='up':
+            return True
+        else:
+            return False

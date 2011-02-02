@@ -54,20 +54,21 @@ ACTIVITATS = [
 
 class Operacions(object):
 
-    def __init__(self,request, username,password,eid='',tid=''):
+    def __init__(self, request, username, password, eid='', tid=''):
         """
         """
+        self.request = request
         registry = request.registry
-        epitool=registry.getUtility(IEPIUtility)
+        self.epitool=registry.getUtility(IEPIUtility)
 
         self.initialized = True
         self.username = username
         self.password = password
         self.equipID=eid
         self.tecnicID=tid
-        self.browser_login,self.externalLoginKey=epitool.recoverBrowserSession(request, self.username,'operacions')
+        self.browser_login,self.externalLoginKey=self.epitool.recoverBrowserSession(request, self.username,'operacions')
         if self.browser_login:
-          #Si tenim cookies anteriors, creem un browser nou i  li passem les cookies guardades
+          #Si tenim cookies anteriors, creem un browser nou i li passem les cookies guardades
           self.br=Browser()
           self.br.set_handle_robots(False)
           cj = LWPCookieJar()
@@ -131,11 +132,10 @@ class Operacions(object):
     def saveSessionData(self,):
         """
         """
-        epitool = getUtility(IEPIUtility)
-        epitool.saveBrowserSession(self.username,self.getBrowserSession(),'operacions')
+        self.epitool.saveBrowserSession(self.request, self.username,self.getBrowserSession(),'operacions')
         return
 
-    def login(self,message = "Logging-in into operacions via regular login"):
+    def login(self, message = "Logging-in into operacions via regular login"):
         """
         Es logueja a operacions amb el login tradicional web
         """
@@ -230,7 +230,7 @@ class Operacions(object):
         return fixedHTML
 
     #@cache(smartCacheKey)
-    @reloginIfCrashedAndCache
+    #@reloginIfCrashedAndCache
     def obtenirPortalTecnic(self,fname='obtenirPortalTecnic'):
         """
         """
@@ -392,7 +392,7 @@ class Operacions(object):
         return imputacions_raw
 
     #@cache(smartCacheKey)
-    @reloginIfCrashedAndCache
+    #@reloginIfCrashedAndCache
     def obtenirImputacions(self,di=None,df=None,fname='obtenirImputacions'):
         """
         """

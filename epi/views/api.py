@@ -44,3 +44,7 @@ class TemplateAPI(object):
         self._error_message = value
 
     errorMessage = property(getErrorMessage, setErrorMessage)
+    
+    def getAppURL(self):
+        return self.request.application_url
+        

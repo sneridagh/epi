@@ -124,36 +124,44 @@ class EPIUtility(object):
         persistentobj.sessions[username]['browser'][web]=br
         persistentobj.sessions[username]._p_changed= 1
 
-    def saveLastAccessed(self,username,time_accessed):
+    def saveLastAccessed(self, request, username, time_accessed):
         """
         """
+        persistentobj = self.get_storage(request)
+        
         userdata = OOBTree()
-        if self.storage.has_key(username)>0:
-            userdata = self.storage[username]
+        if persistentobj.storage.has_key(username)>0:
+            userdata = persistentobj.storage[username]
         userdata['last_accessed']=time_accessed
-        self.storage[username]=userdata
+        persistentobj.storage[username]=userdata
 
-    def recoverLastAccessed(self,username):
+    def recoverLastAccessed(self, request, username):
+        persistentobj = self.get_storage(request)
+        
         last = None
-        if self.storage.has_key(username)>0:
-          if self.storage[username].has_key('last_accessed'):
-            last = self.storage[username]['last_accessed']
+        if persistentobj.storage.has_key(username)>0:
+          if persistentobj.storage[username].has_key('last_accessed'):
+            last = persistentobj.storage[username]['last_accessed']
         return last
 
 
-    def saveMarcadors(self,username,marcadors):
+    def saveMarcadors(self, request, username,marcadors):
         """
         """
+        persistentobj = self.get_storage(request)
+        
         userdata = OOBTree()
-        if self.storage.has_key(username)>0:
-            userdata = self.storage[username]
+        if persistentobj.storage.has_key(username)>0:
+            userdata = persistentobj.storage[username]
         userdata['marcadors']=marcadors
-        self.storage[username]=userdata
+        persistentobj.storage[username]=userdata
 
-    def recoverMarcadors(self,username):
+    def recoverMarcadors(self, request, username):
+        persistentobj = self.get_storage(request)
+        
         last = None
-        if self.storage.has_key(username)>0:
-          if self.storage[username].has_key('marcadors'):
-            marcadors = self.storage[username]['marcadors']
+        if persistentobj.storage.has_key(username)>0:
+          if persistentobj.storage[username].has_key('marcadors'):
+            marcadors = persistentobj.storage[username]['marcadors']
         return marcadors
     

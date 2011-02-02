@@ -3,9 +3,12 @@ from persistent import Persistent
 from BTrees.OOBTree import OOBTree
 from epi.interfaces import IEPIUtility
 from zope.interface import implements
+from pyramid.security import Allow, Authenticated
 
 class Root(PersistentMapping):
     __parent__ = __name__ = None
+    __acl__ = [ (Allow, Authenticated, 'view'),
+                (Allow, 'victor.fernandez','edit') ]
 
 def appmaker(zodb_root):
     if not 'app_root' in zodb_root:

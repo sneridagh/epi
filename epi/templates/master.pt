@@ -51,13 +51,10 @@
 
 <body>
 
-<div id="container">
+<div id="wrapper">
     <header>
         <div class="row">
-            <div class ="cell width-2  position-0">
-                <img src="/static/pyreneesSmall.png" />
-            </div>
-            <div class ="cell width-2  position-10">
+            <div class ="cell width-2  position-12">
                 <!-- ToolBar Links -->
                 <ul id="toolbox" class="ui-corner-all" tal:condition="api.authenticatedUser">
                     <li><a href="/editProfile" tal:content="api.authenticatedUser"></a></li>

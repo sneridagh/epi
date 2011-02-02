@@ -184,7 +184,7 @@ margin-bottom:5px;
 #ajaxWorking{
 width:100%;
 height:100%;
-background:url(++resource++epi.core.images/loader.gif) center center no-repeat;
+background:url(/images/loader.gif) center center no-repeat;
 position:absolute;
 display:none;
 }
@@ -247,7 +247,7 @@ padding:2px;
 }
 
 #permisos label {
-    background: url("++resource++epi.core.images/expand.png") no-repeat scroll left center transparent;
+    background: url("/images/expand.png") no-repeat scroll left center transparent;
     color: white;
     cursor: pointer;
     font-size: 14px;
@@ -282,17 +282,17 @@ border:none;
 .sidebox {
 	margin: 0 auto; /* center for now */
 	width: 700px; /* ems so it will grow */
-	background: url(++resource++epi.core.images/sbbody-r.gif) repeat-y bottom right;
+	background: url(/images/sbbody-r.gif) repeat-y bottom right;
 	font-size: 100%;
 }
 .boxhead {
-	background: url(++resource++epi.core.images/sbhead-r.gif) no-repeat top right;
+	background: url(/images/sbhead-r.gif) no-repeat top right;
 	margin: 0;
 	padding: 0;
 	text-align: center;
 }
 .boxhead h4 {
-	background: url(++resource++epi.core.images/sbhead-l.gif) no-repeat top left;
+	background: url(/images/sbhead-l.gif) no-repeat top left;
 	margin: 0;
 	padding: 30px 0px 20px 0px;
 	color: white;
@@ -303,7 +303,7 @@ border:none;
 	cursor: pointer;
 }
 .boxbody {
-	background: url(++resource++epi.core.images/sbbody-l.gif) repeat-y bottom left;
+	background: url(/images/sbbody-l.gif) repeat-y bottom left;
 	margin: 0;
 	padding: 10px 30px 10px 38px;
 }
@@ -322,14 +322,14 @@ border-bottom: 2px solid #9DADC6;
 padding-bottom:5px;
 }
 .boxfoot {
-	background: url(++resource++epi.core.images/sbfoot-r.gif) no-repeat bottom right;
+	background: url(/images/sbfoot-r.gif) no-repeat bottom right;
 	margin: 0;
 	padding: 0;
 	height:33px;
 }
 
 .boxfoot span {
-	background: url(++resource++epi.core.images/sbfoot-l.gif) no-repeat bottom left;
+	background: url(/images/sbfoot-l.gif) no-repeat bottom left;
 	margin: 0;
 	padding-bottom: 12px;
 	padding-left:30px;
