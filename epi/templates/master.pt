@@ -28,10 +28,10 @@
 
 
     <!-- CSS : implied media="all" -->
-    <link rel="stylesheet" href="css/style.css?v=2" />
+    <!-- <link rel="stylesheet" href="css/style.css?v=2" /> -->
     <link type="text/css" href="css/smoothness/jquery-ui-1.8.6.custom.css" rel="stylesheet" />
     <link type="text/css" href="css/deco.css" rel="stylesheet" />
-    <link type="text/css" href="css/pyrenees.css" rel="stylesheet" />
+    <!-- <link type="text/css" href="css/pyrenees.css" rel="stylesheet" /> -->
 
 	<!-- CSS EPI -->
     <link rel="stylesheet" type="text/css" href="css/epi.css" media="screen"/>
@@ -53,15 +53,10 @@
 
 <div id="wrapper">
     <header>
-        <div class="row">
-            <div class ="cell width-2  position-12">
-                <!-- ToolBar Links -->
-                <ul id="toolbox" class="ui-corner-all" tal:condition="api.authenticatedUser">
-                    <li><a href="/editProfile" tal:content="api.authenticatedUser"></a></li>
-                    <li><a href="/logout">Logout</a></li>
-                </ul>
-            </div>
-        </div>
+       <!-- 
+       <ul id="toolbox" class="ui-corner-all" tal:condition="api.authenticatedUser">
+           <li><a href="/logout">Logout</a></li>
+       </ul> -->
     </header>
     
     <div metal:define-slot="main">

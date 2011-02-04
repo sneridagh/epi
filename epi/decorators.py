@@ -6,6 +6,20 @@ from plone.memoize.volatile import ATTR,CONTAINER_FACTORY,_marker, DontCache, st
 from plone.memoize.interfaces import ICacheChooser
 from zope import component
 
+def reloginIfCrashed(fn,self,*args,**kwargs):
+    """
+    Prova de executar la funció fn amb els parametres passats i en cas de retornar "EXPIRED"
+    re-logueja al modul actual i torna a executar la funció.
+    """
+    value = fn(self,*args, **kwargs)
+    if value=='EXPIRED':
+        message = '%s INFO La funció %s ha fallat per culpa d''una cookie caducada. Refent el login...' % (DateTime().ISO(),fn.__name__)
+        self.login(message=message)
+        value = fn(self,*args, **kwargs)
+    return value
+
+################ Old Decorators!
+
 def smartCacheKey(fn,*args,**kwargs):
     """
     """

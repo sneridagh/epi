@@ -81,7 +81,7 @@ def login(context, request):
          remember_headers = auth_tkt.remember(request.environ, credentials)
         else:
          remember_headers = []
-        
+
         # Quan entra, guardar les credencials a la utility
         registry = request.registry
         epiUtility=registry.getUtility(IEPIUtility)

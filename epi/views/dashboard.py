@@ -7,10 +7,8 @@ from epi.models import Root
 from epi.interfaces import IEPIUtility
 
 from epi.presencia import Presencia
-from epi.presencia import getMarcatges
 from epi.presencia import MOTIUS_PERMISOS as MOTIUS
 from epi.operacions import Operacions,ACTIVITATS
-from mechanize import Browser
 import time
 
 from DateTime import DateTime
@@ -21,7 +19,7 @@ from zope.app.cache.interfaces.ram import IRAMCache
 from zope.component import getUtility
 from copy import deepcopy
 
-from beaker.cache import cache_region, cache_regions
+from beaker.cache import cache_region
 
 @view_config(name="prova.html", renderer='epi:templates/mytemplate.pt')
 def unaltre(context, request):
@@ -46,6 +44,8 @@ class provaView(object):
         self.context = context
         self.request = request
 
+    def __str__(self):
+        return "%s.%s" % (self.__module__, self.__class__.__name__)
     
     def __call__(self):
         # import ipdb; ipdb.set_trace()
@@ -96,260 +96,52 @@ class BaseView(object):
         """
         return [dict(title=a,image=MOTIUS[a]['imatge']) for a in MOTIUS.keys()]
 
-class epiAPI(object):
-    """Atributs de la EPIAPI:
-        context
-        request
-        epiUtility
-        br
-        username
-        options
-        descompte_descans
-    """
-    def __init__(self, context, request):
+@view_config(context=Root, renderer='epi:templates/dashboard.pt', permission='view')
+class dashboardView(BaseView):
+
+    def  __init__(self,context,request):
+        """
+        """
         self.context = context
         self.request = request
         
-        # Agafo utility
+        # Faig la utility disponible com atribit de la classe mare
         registry = self.request.registry
         self.epiUtility=registry.getUtility(IEPIUtility)
-
-        self.br = Browser()
         
-        self.username = authenticated_userid(self.request)
+        self.username, self.password = self.getAuthenticationToken()
         
-        # Rescatat de getSetmanes
-        self.options = self.epiUtility.getEPIOptions(self.request, self.username)
-        self.descompte_descans = self.options['descomptar_30'] and 30 or 0        
+        #Si estem identificats, comprovem que tinguem els codis d'usuari del gestor
+        # sino, inicialitzem Operacions i seguidament els agafem i els guardem
+        if self.eid==None or self.tid==None:
+             operacions = Operacions(self.request, self.username, self.password)
+             #Si inicialitzem operacions correctament, obtenim el codi d'usuari i els guardem
+             if operacions.initialized:
+                 self.eid, self.tid = operacions.obtenirCodisUsuari()
+                 self.epiUtility.setUserCodes(self.request, self.username, self.eid, self.tid)
     
+                 operacions.closeBrowser()
+        
+        self.marcatges_avui = []
+        now = DateTime()
+        self.now = DateTimeToTT(now)
+        #import ipdb; ipdb.set_trace()
+        # if self.request.get('relogin',False):
+        #     self.portal_epi_data.sessions=OOBTree()
 
-@view_config(context=Root, renderer='epi:templates/dashboard.pt', permission='view')
-def dashboardView(context, request):
-    
-    # Inicialitzo variables globals
-    epiapi = epiAPI(context, request)
-    
-    username, password, eid, tid= getAuthenticationToken(epiapi)
-    
-    #Si estem identificats, comprovem que tinguem els codis d'usuari del gestor
-    # sino, inicialitzem Operacions i seguidament els agafem i els guardem
-    if eid==None or tid==None:
-         operacions = Operacions(request, username, password)
-         #Si inicialitzem operacions correctament, obtenim el codi d'usuari i els guardem
-         if operacions.initialized:
-             eid, tid = operacions.obtenirCodisUsuari()
-             epiUtility.setUserCodes(request, username, eid, tid)
+    def __call__(self):
+        """
+        """
+        
+        # #Esborrem la cache si hem clicat al logo de l'epi
+        # if self.request.get('refresh',False):
+        #     self.invalidateAll()
+        #     self.request.response.redirect(portal_url)
+        #     return
 
-             operacions.closeBrowser()
-
-    # Vik: Aqui inicialitza per primera vegada presencia
-    presencia = Presencia(request, username, password)
-
-    # Atributs 'globals'
-    marcatges_avui = []
-    now = DateTime()
-    now = DateTimeToTT(now)
-    
-    #import ipdb; ipdb.set_trace()
-    # if self.request.get('relogin',False):
-    #     self.portal_epi_data.sessions=OOBTree()
-
-    page_title = "%s Dashboard" % username
-    api = TemplateAPI(context, request, page_title)
-    return dict(api = api, epiapi=epiapi,
-                getSetmanes=getSetmanes(request, username))
-
-def getAuthenticationToken(epiapi):
-    """
-    """
-    username = epiapi.username
-    password = epiapi.epiUtility.getUserPassword(epiapi.request, username)
-    eid,tid = epiapi.epiUtility.getUserCodes(epiapi.request, username)
-    return (username, password, eid, tid)
-
-def getSetmanes(epiapi):
-    """
-    """
-    NUMSETMANES = 4
-    setmanes = []
-    now = DateTime()
-    dow = now.dow()==0 and 7 or now.dow()
-    #fdofw = primer dia de la primera setmana que mostrarem segons NUMSETMANES a mostrar
-    fdofw = addDays(now,1-dow-(NUMSETMANES*7))
-    dies = getDies(epiapi, first_day = fdofw,last_day = lastDayOfWeek())
-    for setmana in range(0,NUMSETMANES):
-        diesarestar = 7*setmana
-        fdow = addDays(now,1-dow-diesarestar)
-        setmanes.append(self.getSetmana(dies,fdow))
-    return setmanes
-
-def getDies(epiapi, historic=None, first_day = None, last_day = None):
-    """
-    """
-    t0 = time.time()
-
-    descompte_descans = epiapi.descompte_descans
-    hores_diaries = epiapi.options['hores_diaries']
-
-    tm = time.time()
-    marcatges = deepcopy(getMarcatges(epiapi))
-    if historic:
-        marcatges.update(deepcopy(presencia.getMarcatgesHistoric(historic,fname="getMarcatgesHistoric")))
-
-    ##############
-    ##############
-    print "%.3f segons per obtenir marcatges" % (time.time()-tm)
-
-    primer = DateTimeToTT(first_day)
-    ultim  = DateTimeToTT(last_day)
-
-    if historic:
-        data_imputacio1 ='01-01-%s' % (primer[2])
-        data_imputacio2 ='31-12-%s' % (primer[2])
-    else:
-        data_imputacio1 ='%s-%s-%s' % (primer)
-        data_imputacio2 ='%s-%s-%s' % (ultim)
-
-    di2 = DateTime('%s/%s/%s' % ultim[::-1])
-    di1 = DateTime('%s/%s/%s' % primer[::-1])        
-
-    dates_range = [DateTimeToTT(di1+a) for a in range(0,daysBetweenDates(di1,di2)+1)]
-
-    tm = time.time()
-    imputacions_entre_dates = operacions.obtenirImputacions(self.username, data_imputacio1, data_imputacio2)
-
-    self.tiquets = self.getImputacionsRecents(imputacions_entre_dates,'TI')
-    self.problemes = self.getImputacionsRecents(imputacions_entre_dates,'PB')
-
-    print "%.3f segons per obtenir imputacions" % (time.time()-tm)
-
-    dies = {}
-    marcadors = {}
-    self.presenciaStatus = 'down'
-    if self.now in marcatges.keys():
-        self.marcatges_avui = marcatges[self.now]['marcatges']
-        if True in [None in m for m in self.marcatges_avui]:
-            self.presenciaStatus = 'up'
-
-
-    oberts = []
-    for data in dates_range:
-        # Estem iterant per totes les dates entre les quals s'han buscat imputacions
-        # Si la data que processem no conte cap marcatge, insertarem un dia buit
-        fitxats = 0
-        marcatgeObert=None
-        if data in marcatges.keys():
-            dia = marcatges[data]
-            fitxats = dia['total']
-            if dia['total']==0:
-                for f in dia['marcatges']:
-                    if f[1]==None:
-                        marcatgeObert=f[0].ISO()
-                        fitxatsTemporal = fitxats
-                    fitxats = fitxats + minutsEntreDates(f[0],f[1])
-        else:
-            dia = dict(especial=[],
-                       total=0,
-                       permisos=[],
-                       marcatges=[],
-                       link_marcatge='')
-
-        permisos = sum([permis['minutes'] for permis in dia['permisos'] if permis['compta_hores']])
-        nch = [permis for permis in dia['permisos'] if not permis['compta_hores']]
-        festa_o_intensiva = presencia.getDiscountHoursForDay(data,hores_diaries)
-        #permisos = permisos + festa_o_intensiva
-
-        especials = deepcopy(dia['permisos'])
-        if festa_o_intensiva:
-            especials.append(dict(image='festa.jpg',
-                                  title=festa_o_intensiva[0],
-                                  minutes=festa_o_intensiva[1]*60,
-                                  compta_hores=False))
-        minutspermisforalloctreball = sum([a['minutes'] for a in dia.get('permisos',[]) if 'E/S fora del lloc de treball' in a['title']])
-        fitxats = fitxats+minutspermisforalloctreball
-
-        total=fitxats
-        imputacions = [imputacio for imputacio in imputacions_entre_dates if imputacio['date']==data]
-        imputats = 0
-
-        for i in imputacions:
-            imputats = imputats + HMaMinuts(i['amount'])
-        aimputar = (total-descompte_descans>=0) and (total-descompte_descans) or fitxats
-
-        pendents = aimputar-imputats
-        diadict=dict(data='%s%s%s' % data,
-                 dia=data[0],
-                 marcades=MinutsAHM(fitxats),
-                 permisos=MinutsAHM(permisos),
-                 total=MinutsAHM(total),
-                 imputades=MinutsAHM(imputats),
-                 aimputar=MinutsAHM(aimputar),
-                 pendents=MinutsAHM(pendents),
-                 imputacions=[dict(ref=imp['referencia'],iid=imp['iid'],amount=imp['amount'],type=imp['type']) for imp in imputacions],
-                 especials=especials,
-                 obert = dia.get('marcatgeobert','0'),
-                 link=dia['link_marcatge']
-                 )
-        #Només afegirem el dia si té imputacions o estem fitxats o te permisos
-        #Això inclou els casos:
-        #  - Un dia que no hem fitxat pero hi tenim imputacions, les podem veure
-        #  - Un dia que hem fitxat pero no tenim imputacions
-        #  - Un dia fitxat amb imputacions
-        #  - Els dies entre setmana sense fitxar ni imputacions, es pintaran en blanc a la funcio getSetmanes
-        #    en canvi els cap de setmana si no tenen res no es pintaran, si tenen imputacions, sí (també al getSetmanes)
-        #  - Si tenim algun permis, es mostrarà enara que no tinguem imputacions
-        hi_han_imputacions = diadict['imputacions']
-        sha_fitxat = diadict['total']!='00:00'
-
-        # Casos de la condicio (('Festa' not in [a['title'] for a in dia['especials']]) or TTToDateTime(data).dow()<=5)
-        # Si no hi han "especials" sempre evalua a False
-        # Si hi han especials:
-        #   - hi ha algun permis entre setmana - PINTEM
-        #   - hi ha algun permis al finde - PINTEM
-        #   - hi ha una festa entre setmana - PINTEM
-        #   - hi ha una festa en finde - NO PINTEM
-        #   - cap especial és festa i el dia es un cap de setmana
-        es_entre_setmana = TTToDateTime(data).dow() not in [0,6]
-        dia_de_festa_entre_setmana = diadict['especials'] and (('Festa' not in [a['title'] for a in diadict['especials']]) or es_entre_setmana)
-        if hi_han_imputacions or sha_fitxat or dia_de_festa_entre_setmana :
-            dies[data]=diadict
-
-        if marcatgeObert:
-           fitxatsbase = fitxatsTemporal
-        else:
-           fitxatsbase = fitxats
-
-        marcadors[data]=dict(marcades=fitxatsbase,
-                             marcatgeObert=marcatgeObert,
-                             aimputar=aimputar,
-                             imputades=imputats,
-                             pendents=pendents)
-
-
-    operacions.closeBrowser()
-
-    presencia.closeBrowser()
-
-
-
-    self.epiUtility.saveLastAccessed(self.request, self.username,DateTime().ISO())
-    self.epiUtility.saveMarcadors(self.request, self.username,marcadors)
-    print "%.3f segons TOTAL" % (time.time()-t0)
-    return dies
-
-    # def __call__(self):
-    #     """
-    #     """
-    #     
-    #     # #Esborrem la cache si hem clicat al logo de l'epi
-    #     # if self.request.get('refresh',False):
-    #     #     self.invalidateAll()
-    #     #     self.request.response.redirect(portal_url)
-    #     #     return
-    # 
-    #     page_title = "%s Dashboard" % self.username
-    #     api = TemplateAPI(self.context, self.request, page_title)
-    #     return dict(api = api)
+        page_title = "%s Dashboard" % self.username
+        api = TemplateAPI(self.context, self.request, page_title)
+        return dict(api = api)
 
     def getPreviousMonth(self,actual):
         """
@@ -447,7 +239,24 @@ def getDies(epiapi, historic=None, first_day = None, last_day = None):
         mes['horespendents'] = MinutsAHM(HMaMinuts(mes['horesatreballar'])-HMaMinuts(mes['horestreballades']))
         return mes
 
+    def getSetmanes(self):
+        """
+        """
+        self.options = self.epiUtility.getEPIOptions(self.request, self.username)
+        self.descompte_descans = self.options['descomptar_30'] and 30 or 0
 
+        NUMSETMANES = 4
+        setmanes = []
+        now = DateTime()
+        dow = now.dow()==0 and 7 or now.dow()
+        #fdofw = primer dia de la primera setmana que mostrarem segons NUMSETMANES a mostrar
+        fdofw = addDays(now,1-dow-(NUMSETMANES*7))
+        dies = self.getDies(first_day = fdofw,last_day = lastDayOfWeek())
+        for setmana in range(0,NUMSETMANES):
+            diesarestar = 7*setmana
+            fdow = addDays(now,1-dow-diesarestar)
+            setmanes.append(self.getSetmana(dies,fdow))
+        return setmanes
 
     def getSetmana(self,dies_data,fdow,day_filter=None):
         """
@@ -580,7 +389,163 @@ def getDies(epiapi, historic=None, first_day = None, last_day = None):
         return setmana_dict
 
 
+    def getDies(self,historic=None,first_day = None,last_day = None):
+        """
+        """
+        t0 = time.time()
 
+        operacions = Operacions(self.request, self.username,self.password,self.eid,self.tid)
+        # Vik: Aqui inicialitza per primera vegada presencia
+        presencia = Presencia(self.request, self.username,self.password)
+        self.options = self.epiUtility.getEPIOptions(self.request, self.username)
+        descompte_descans = self.options['descomptar_30'] and 30 or 0
+        hores_diaries = self.options['hores_diaries']
+
+        tm = time.time()
+        marcatges = deepcopy(presencia.getMarcatges(fname="getMarcatges"))
+        if historic:
+            marcatges.update(deepcopy(presencia.getMarcatgesHistoric(historic,fname="getMarcatgesHistoric")))
+
+        ##############
+        ##############
+        print "%.3f segons per obtenir marcatges" % (time.time()-tm)
+
+        primer = DateTimeToTT(first_day)
+        ultim  = DateTimeToTT(last_day)
+
+        if historic:
+            data_imputacio1 ='01-01-%s' % (primer[2])
+            data_imputacio2 ='31-12-%s' % (primer[2])
+        else:
+            data_imputacio1 ='%s-%s-%s' % (primer)
+            data_imputacio2 ='%s-%s-%s' % (ultim)
+
+        di2 = DateTime('%s/%s/%s' % ultim[::-1])
+        di1 = DateTime('%s/%s/%s' % primer[::-1])        
+
+        dates_range = [DateTimeToTT(di1+a) for a in range(0,daysBetweenDates(di1,di2)+1)]
+
+        tm = time.time()
+        imputacions_entre_dates = operacions.obtenirImputacions(self.username, data_imputacio1, data_imputacio2)
+
+        self.tiquets = self.getImputacionsRecents(imputacions_entre_dates,'TI')
+        self.problemes = self.getImputacionsRecents(imputacions_entre_dates,'PB')
+
+        print "%.3f segons per obtenir imputacions" % (time.time()-tm)
+
+        dies = {}
+        marcadors = {}
+        self.presenciaStatus = 'down'
+        if self.now in marcatges.keys():
+            self.marcatges_avui = marcatges[self.now]['marcatges']
+            if True in [None in m for m in self.marcatges_avui]:
+                self.presenciaStatus = 'up'
+
+
+        oberts = []
+        for data in dates_range:
+            # Estem iterant per totes les dates entre les quals s'han buscat imputacions
+            # Si la data que processem no conte cap marcatge, insertarem un dia buit
+            fitxats = 0
+            marcatgeObert=None
+            if data in marcatges.keys():
+                dia = marcatges[data]
+                fitxats = dia['total']
+                if dia['total']==0:
+                    for f in dia['marcatges']:
+                        if f[1]==None:
+                            marcatgeObert=f[0].ISO()
+                            fitxatsTemporal = fitxats
+                        fitxats = fitxats + minutsEntreDates(f[0],f[1])
+            else:
+                dia = dict(especial=[],
+                           total=0,
+                           permisos=[],
+                           marcatges=[],
+                           link_marcatge='')
+
+            permisos = sum([permis['minutes'] for permis in dia['permisos'] if permis['compta_hores']])
+            nch = [permis for permis in dia['permisos'] if not permis['compta_hores']]
+            festa_o_intensiva = presencia.getDiscountHoursForDay(data,hores_diaries)
+            #permisos = permisos + festa_o_intensiva
+
+            especials = deepcopy(dia['permisos'])
+            if festa_o_intensiva:
+                especials.append(dict(image='festa.jpg',
+                                      title=festa_o_intensiva[0],
+                                      minutes=festa_o_intensiva[1]*60,
+                                      compta_hores=False))
+            minutspermisforalloctreball = sum([a['minutes'] for a in dia.get('permisos',[]) if 'E/S fora del lloc de treball' in a['title']])
+            fitxats = fitxats+minutspermisforalloctreball
+
+            total=fitxats
+            imputacions = [imputacio for imputacio in imputacions_entre_dates if imputacio['date']==data]
+            imputats = 0
+
+            for i in imputacions:
+                imputats = imputats + HMaMinuts(i['amount'])
+            aimputar = (total-descompte_descans>=0) and (total-descompte_descans) or fitxats
+
+            pendents = aimputar-imputats
+            diadict=dict(data='%s%s%s' % data,
+                     dia=data[0],
+                     marcades=MinutsAHM(fitxats),
+                     permisos=MinutsAHM(permisos),
+                     total=MinutsAHM(total),
+                     imputades=MinutsAHM(imputats),
+                     aimputar=MinutsAHM(aimputar),
+                     pendents=MinutsAHM(pendents),
+                     imputacions=[dict(ref=imp['referencia'],iid=imp['iid'],amount=imp['amount'],type=imp['type']) for imp in imputacions],
+                     especials=especials,
+                     obert = dia.get('marcatgeobert','0'),
+                     link=dia['link_marcatge']
+                     )
+            #Només afegirem el dia si té imputacions o estem fitxats o te permisos
+            #Això inclou els casos:
+            #  - Un dia que no hem fitxat pero hi tenim imputacions, les podem veure
+            #  - Un dia que hem fitxat pero no tenim imputacions
+            #  - Un dia fitxat amb imputacions
+            #  - Els dies entre setmana sense fitxar ni imputacions, es pintaran en blanc a la funcio getSetmanes
+            #    en canvi els cap de setmana si no tenen res no es pintaran, si tenen imputacions, sí (també al getSetmanes)
+            #  - Si tenim algun permis, es mostrarà enara que no tinguem imputacions
+            hi_han_imputacions = diadict['imputacions']
+            sha_fitxat = diadict['total']!='00:00'
+
+            # Casos de la condicio (('Festa' not in [a['title'] for a in dia['especials']]) or TTToDateTime(data).dow()<=5)
+            # Si no hi han "especials" sempre evalua a False
+            # Si hi han especials:
+            #   - hi ha algun permis entre setmana - PINTEM
+            #   - hi ha algun permis al finde - PINTEM
+            #   - hi ha una festa entre setmana - PINTEM
+            #   - hi ha una festa en finde - NO PINTEM
+            #   - cap especial és festa i el dia es un cap de setmana
+            es_entre_setmana = TTToDateTime(data).dow() not in [0,6]
+            dia_de_festa_entre_setmana = diadict['especials'] and (('Festa' not in [a['title'] for a in diadict['especials']]) or es_entre_setmana)
+            if hi_han_imputacions or sha_fitxat or dia_de_festa_entre_setmana :
+                dies[data]=diadict
+
+            if marcatgeObert:
+               fitxatsbase = fitxatsTemporal
+            else:
+               fitxatsbase = fitxats
+
+            marcadors[data]=dict(marcades=fitxatsbase,
+                                 marcatgeObert=marcatgeObert,
+                                 aimputar=aimputar,
+                                 imputades=imputats,
+                                 pendents=pendents)
+
+
+        operacions.closeBrowser()
+
+        presencia.closeBrowser()
+
+
+
+        self.epiUtility.saveLastAccessed(self.request, self.username,DateTime().ISO())
+        self.epiUtility.saveMarcadors(self.request, self.username,marcadors)
+        print "%.3f segons TOTAL" % (time.time()-t0)
+        return dies
 
     def getActivitats(self):
         """
@@ -593,9 +558,10 @@ def getDies(epiapi, historic=None, first_day = None, last_day = None):
         """
         return [dict(entrada=DateTimeToHM(a[0]),sortida=DateTimeToHM(a[1])) for a in self.marcatges_avui]
 
+    # Vik: refactoritzar per a que agafi una instanciació única de operacions de la classe
     def getTiquets(self):
-        eid,tid = self.context.portal_epi_data.getUserCodes(self.username)
-        operacions = Operacions(self.username,self.password,eid,tid)
+        eid,tid = self.epiUtility.getUserCodes(self.request, self.username)
+        operacions = Operacions(self.request, self.username,self.password,eid,tid)
         tiquets = operacions.obtenirTiquetsAssignats()
 
         operacions.closeBrowser()
@@ -606,9 +572,10 @@ def getDies(epiapi, historic=None, first_day = None, last_day = None):
         separador = [dict(requirementId='0',title="=== Altres tiquets on s'ha imputat recentment ==="),]
         return tiquets+separador+no_repetits
 
+    # Vik: refactoritzar per a que agafi una instanciació única de operacions de la classe
     def getProblemes(self):
-        eid,tid = self.context.portal_epi_data.getUserCodes(self.username)
-        operacions = Operacions(self.username,self.password,eid,tid)
+        eid,tid = self.epiUtility.getUserCodes(self.request, self.username)
+        operacions = Operacions(self.request, self.username,self.password,eid,tid)
         gpos = operacions.obtenirProblemesAssignats()
 
         operacions.closeBrowser()
@@ -619,12 +586,13 @@ def getDies(epiapi, historic=None, first_day = None, last_day = None):
         separador = [dict(requirementId='0',title="=== Altres problemes on s'ha imputat recentment ==="),]
         return gpos+separador+no_repetits
 
+    # Vik: refactoritzar per a que agafi una instanciació única de operacions de la classe
     def getOrdres(self):
         """
         """
 
-        eid,tid = self.context.portal_epi_data.getUserCodes(self.username)
-        operacions = Operacions(self.username,self.password,eid,tid)
+        eid,tid = self.epiUtility.getUserCodes(self.request, self.username)
+        operacions = Operacions(self.request, self.username,self.password,eid,tid)
         ordres = operacions.obtenirOrdres(fname="obtenirOrdres")
 
         operacions.closeBrowser()
