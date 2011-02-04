@@ -406,7 +406,9 @@ class Presencia(object):
             return (None,None)
 
     ##@reloginIfCrashedAndCache
-    def getPresencia(self,fname='getPresencia'):
+    @cache_region('long_term', 'getPresencia')
+    @reloginIfCrashed
+    def getPresencia(self):
         """
         Recupera la pàgina de persones de presència, on hi han els telèfons de cadascú i si esta o no presents
         La pàgina no té cap mena de id's ni classes, el parsejat es una mica dur...
@@ -473,8 +475,8 @@ class Presencia(object):
         return dict(nom=nom,online=online,intern=telefon_intern,mobil=telefon_mobil,public=telefon_public)
 
     #@reloginIfCrashedAndCache
-    @reloginIfCrashed
     @cache_region('long_term', 'getPermisosHistoric')
+    @reloginIfCrashed
     def getPermisosHistoric(self, username, year):
         """
         """
@@ -482,8 +484,8 @@ class Presencia(object):
         return self.getPermisosBase(PERMISOS_HISTORIC_URL % year)
 
     #@reloginIfCrashedAndCache
-    @reloginIfCrashed
     @cache_region('default_term', 'getPermisos')
+    @reloginIfCrashed
     def getPermisos(self, username):
         """
         """

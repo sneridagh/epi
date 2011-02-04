@@ -68,6 +68,12 @@ class BaseView(object):
         self.context = context
         self.request = request
 
+        # Faig la utility disponible com atribut de la classe mare
+        registry = self.request.registry
+        self.epiUtility=registry.getUtility(IEPIUtility)
+        
+        self.username, self.password = self.getAuthenticationToken()
+
     def getAuthenticationToken(self):
         """
         """
@@ -102,14 +108,7 @@ class dashboardView(BaseView):
     def  __init__(self,context,request):
         """
         """
-        self.context = context
-        self.request = request
-        
-        # Faig la utility disponible com atribit de la classe mare
-        registry = self.request.registry
-        self.epiUtility=registry.getUtility(IEPIUtility)
-        
-        self.username, self.password = self.getAuthenticationToken()
+        super(dashboardView, self).__init__(context,request)
         
         #Si estem identificats, comprovem que tinguem els codis d'usuari del gestor
         # sino, inicialitzem Operacions i seguidament els agafem i els guardem
