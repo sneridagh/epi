@@ -231,7 +231,9 @@ class Operacions(object):
 
     #@cache(smartCacheKey)
     #@reloginIfCrashedAndCache
-    def obtenirPortalTecnic(self,fname='obtenirPortalTecnic'):
+    @cache_region('default_term', 'obtenirPortalTecnic')
+    @reloginIfCrashed
+    def obtenirPortalTecnic(self, username):
         """
         """
         self.reloadExternalLoginKey()
@@ -267,7 +269,7 @@ class Operacions(object):
     def obtenirOrdres(self,fname='obtenirOrdres'):
         """
         """
-        soup = self.obtenirPortalTecnic(fname="obtenirPortalTecnic")['ordres']
+        soup = self.obtenirPortalTecnic(self.username)['ordres']
         ordres = []
         if soup:
           for tr in soup.findAll('tr'):
@@ -309,19 +311,19 @@ class Operacions(object):
     def obtenirTiquetsAssignats(self):
         """
         """
-        soup = self.obtenirPortalTecnic(fname="obtenirPortalTecnic")['tiquets']
+        soup = self.obtenirPortalTecnic(self.username)['tiquets']
         return self.processarTaula(soup)
 
     def obtenirProblemesAssignats(self):
         """
         """
-        soup = self.obtenirPortalTecnic(fname="obtenirPortalTecnic")['problemes']
+        soup = self.obtenirPortalTecnic(self.username)['problemes']
         return self.processarTaula(soup)
 
     def obtenirCanvisAssignats(self):
         """
         """
-        soup = self.obtenirPortalTecnic(fname="obtenirPortalTecnic")['canvis']
+        soup = self.obtenirPortalTecnic(self.username)['canvis']
         return self.processarTaula(soup)
 
 
@@ -394,6 +396,7 @@ class Operacions(object):
     #@cache(smartCacheKey)
     #@reloginIfCrashedAndCache
     @cache_region('default_term', 'obtenirImputacions')
+    @reloginIfCrashed
     def obtenirImputacions(self, username, di=None, df=None):
         """
         """
@@ -440,6 +443,7 @@ class Operacions(object):
         self.saveSessionData()
         return imputacions
 
+    @cache_region('default_term', 'imputarOrdre')
     @reloginIfCrashed
     def imputarOrdre(self,data,hores,minuts,orderId,orderItemSeqId,fname='imputarOrdre'):
         """
