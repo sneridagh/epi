@@ -6,11 +6,9 @@ from DateTime import DateTime
 from epi.dateutils import HMaMinuts,TTToDateTime,DateTimeToTT,addDays
 from epi.decorators import *
 from epi.interfaces import IEPIUtility
-from zope.app.cache.interfaces.ram import IRAMCache
-from zope.component import getUtility
 from copy import deepcopy
 import logging
-from beaker.cache import cache_region
+from beaker.cache import cache_region, region_invalidate
 
 MOTIUS_PERMISOS = {'Permis sense sou': {'compta_hores':False,'imatge': 'permis.jpg'},
 'Permís per estudis': {'compta_hores':True,'imatge': 'permis.jpg'},
@@ -157,27 +155,33 @@ class Presencia(object):
         if self.checkBrowserExpired(persones_html):
             return 'EXPIRED'
         persones.close()
-        getUtility(IRAMCache).invalidate('getMarcatges')
-        getUtility(IRAMCache).invalidate('getPresencia')
+        # getUtility(IRAMCache).invalidate('getMarcatges')
+        region_invalidate(getMarcatges, None, 'getMarcatges', self.username)
+        # getUtility(IRAMCache).invalidate('getPresencia')
+        region_invalidate(getPresencia, None, 'getPresencia')
         return True
         print "S'ha canviat l'estat de marcatge"
 
     ##@reloginIfCrashedAndCache
-    def getMarcatgesHistoric(self,year,fname='getMarcatgesHistoric'):
+    @cache_region('long_term', 'getMarcatgesHistoric')
+    @reloginIfCrashed
+    def getMarcatgesHistoric(self, username, year):
         """
         Recupera la pàgina de marcatges de presència de l'històric anual, on hi ha tot el que no surt a la pagina principal
         La pàgina no té cap mena de id's ni classes, el parsejat es una mica dur...
         """
-        self.log("getMarcatges Historic %s" % year)
+        self.log("getMarcatges Historic %s sense cachejar" % year)
         return self.getMarcatgesBase(MARCATGES_HISTORIC_URL % year,year=int(year))
 
     ##@reloginIfCrashedAndCache
-    def getMarcatges(self,fname='getMarcatges'):
+    @cache_region('long_term', 'getMarcatges')
+    @reloginIfCrashed
+    def getMarcatges(self, username):
         """
         Recupera la pàgina de marcatges de presència, on hi han els dos ultims mesos de marcatges.
         La pàgina no té cap mena de id's ni classes, el parsejat es una mica dur...
         """
-        self.log("getMarcatges")
+        self.log("getMarcatges sense cachejar")
         return self.getMarcatgesBase(MARCATGES_URL)
 
     def getDiscountHoursForDay(self,dia,hores_dia):
@@ -274,12 +278,8 @@ class Presencia(object):
         historic_query_year = kwargs.get('year',None)        
         is_historic_query = historic_query_year!=None
 
-        # Vik: Mocking days_of_past_year
-        # days_of_past_year = {('28', '01', '2011'): {'total': 0, 'permisos': [{'image': 'teletreball.jpg', 'minutes': 420, 'compta_hores': False, 'title': 'Teletreball'}], 'link_marcatge': '', 'marcatges': []}, ('19', '01', '2011'): {'total': 0, 'permisos': [{'image': 'teletreball.jpg', 'minutes': 420, 'compta_hores': False, 'title': 'Teletreball'}], 'link_marcatge': '', 'marcatges': []}}
-
         if is_historic_query:
             days_of_query_year = current_year==historic_query_year and deepcopy(self.getPermisos(self.username)) or deepcopy(self.getPermisosHistoric(self.username, historic_query_year))
-            # Vik: treure l'ultim any
             days_of_query_past_year = deepcopy(self.getPermisosHistoric(self.username, historic_query_year-1))
             dies = days_of_query_year
             dies.update(days_of_query_past_year)
@@ -490,11 +490,6 @@ class Presencia(object):
         """
         """
         self.log("getPermisos sense cachejar")
-        # pb = self.getPermisosBase(PERMISOS_URL)
-        # if pb=='EXPIRED':
-        #     message = 'getPermisos - %s INFO La funció ha fallat per culpa d''una cookie caducada. Refent el login...' % (DateTime().ISO())
-        #     self.login(message=message)
-        #     pb = self.getPermisosBase(PERMISOS_URL)
         return self.getPermisosBase(PERMISOS_URL)
 
     def getPermisosBase(self,url,fname='getPermisos'):

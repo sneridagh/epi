@@ -164,4 +164,22 @@ class EPIUtility(object):
           if persistentobj.storage[username].has_key('marcadors'):
             marcadors = persistentobj.storage[username]['marcadors']
         return marcadors
-    
+
+    def saveObtenirImputacionsDays(self, request, username, day1, day2):
+        persistentobj = self.get_storage(request)
+        
+        days = [day1, day2]
+        userdata = OOBTree()
+        if persistentobj.storage.has_key(username)>0:
+            userdata = persistentobj.storage[username]
+        userdata['obtenir_imputacions_days']=days
+        persistentobj.storage[username]=userdata
+        
+    def getObtenirImputacionsDays(self, request, username):
+        persistentobj = self.get_storage(request)
+        
+        days = []
+        if persistentobj.storage.has_key(username)>0:
+          if persistentobj.storage[username].has_key('obtenir_imputacions_days'):
+            days = persistentobj.storage[username]['obtenir_imputacions_days']
+        return days

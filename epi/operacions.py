@@ -7,10 +7,8 @@ from epi.dateutils import HMaMinuts,DateTimeToTT
 from DateTime import DateTime
 from epi.decorators import *
 from epi.interfaces import IEPIUtility
-from zope.app.cache.interfaces.ram import IRAMCache
-from zope.component import getUtility
 import logging
-from beaker.cache import cache_region
+from beaker.cache import cache_region, region_invalidate
 
 
 LOGIN_URL = 'https://maul.upc.es:8444/inici/control/main?idEmpresa=1123'
@@ -303,7 +301,8 @@ class Operacions(object):
                try:
                  item['title']='%s - %s' % (item['requirementId'],tds[4].a.span.string)
                except:
-                 import ipdb;ipdb.set_trace()
+                 #import ipdb;ipdb.set_trace()
+                 pass
                items.append(item)
         return items
 
@@ -400,6 +399,7 @@ class Operacions(object):
     def obtenirImputacions(self, username, di=None, df=None):
         """
         """
+        #import ipdb; ipdb.set_trace()
         self.reloadExternalLoginKey()
         self.log("obtenirImputacions entre %s i %s" % (di,df))
         if di==None and df==None:
@@ -440,10 +440,11 @@ class Operacions(object):
             tdict = dict(type=imp_type, date = (dd,mm,aaaa), iid = iid, amount = amount, referencia = referencia)
             imputacions.append(tdict)
         imputacions.reverse()
+        # Guardem els dies que hem consultat a la utility per despres poder cridar correctament als invalidadors de cache
+        self.epitool.saveObtenirImputacionsDays(self.request, username, di, df)
         self.saveSessionData()
         return imputacions
 
-    @cache_region('default_term', 'imputarOrdre')
     @reloginIfCrashed
     def imputarOrdre(self,data,hores,minuts,orderId,orderItemSeqId,fname='imputarOrdre'):
         """
@@ -472,7 +473,10 @@ class Operacions(object):
         exitcode = eval(html)
         exitcode['hores']=hores
         exitcode['minuts']=minuts.rjust(2,'0')
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 
@@ -501,7 +505,10 @@ class Operacions(object):
         exitcode = eval(html)
         exitcode['hores']=hores
         exitcode['minuts']=minuts.rjust(2,'0')
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         return exitcode
 
     def getCodiImputacio(self,data,minuts,ref,tipus):
@@ -511,7 +518,11 @@ class Operacions(object):
         que serà la última imputada.
         """
         self.log("getCodiImputacio")
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        
         imputacions = self.obtenirImputacions(di=data,df=data)
 
         tt = tuple(data.split('-'))
@@ -568,7 +579,10 @@ class Operacions(object):
         code = iid.encode('utf-8')
         if data!=today:
             code = self.canviarImputacio(data,hores,minuts,iid)
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return dict(hores=hores,
                     minuts=minuts.rjust(2,'0'),
@@ -607,7 +621,10 @@ class Operacions(object):
         code=iid.encode('utf-8')
         if data!=today:
             code = self.canviarImputacio(data,hores,minuts,iid)
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return dict(hores=hores,
                     minuts=minuts.rjust(2,'0'),
@@ -633,7 +650,10 @@ class Operacions(object):
             html = response.read()
             if self.checkBrowserExpired(html):
                 return 'EXPIRED'
-            getUtility(IRAMCache).invalidate('obtenirImputacions')
+            # Invalidem la cache
+            # getUtility(IRAMCache).invalidate('obtenirImputacions')
+            day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+            region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
             self.saveSessionData()
         else:
             code = "No sha pogut imputar al dia %s. Refresca lepi i mou la imputacio manualment arrossegant-la al dia %s" % (novadata,novadata)
@@ -661,7 +681,10 @@ class Operacions(object):
         exitcode = eval(html)
         exitcode['hores']=str(int(hores))
         exitcode['minuts']=minuts.rjust(2,'0')
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 
@@ -680,7 +703,10 @@ class Operacions(object):
         if self.checkBrowserExpired(html):
             return 'EXPIRED'
         exitcode = eval(html)
-        getUtility(IRAMCache).invalidate('obtenirImputacions')
+        # Invalidem la cache
+        # getUtility(IRAMCache).invalidate('obtenirImputacions')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 

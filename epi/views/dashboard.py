@@ -401,9 +401,9 @@ class dashboardView(BaseView):
         hores_diaries = self.options['hores_diaries']
 
         tm = time.time()
-        marcatges = deepcopy(presencia.getMarcatges(fname="getMarcatges"))
+        marcatges = deepcopy(presencia.getMarcatges(self.username))
         if historic:
-            marcatges.update(deepcopy(presencia.getMarcatgesHistoric(historic,fname="getMarcatgesHistoric")))
+            marcatges.update(deepcopy(presencia.getMarcatgesHistoric(self.username, historic)))
 
         ##############
         ##############
