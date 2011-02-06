@@ -102,6 +102,7 @@ class BaseView(object):
         """
         return [dict(title=a,image=MOTIUS[a]['imatge']) for a in MOTIUS.keys()]
 
+@view_config(name='vista-mes', renderer='epi:templates/vista-mes.pt', permission='view')
 @view_config(context=Root, renderer='epi:templates/dashboard.pt', permission='view')
 class dashboardView(BaseView):
 
@@ -182,8 +183,7 @@ class dashboardView(BaseView):
     def getMes(self,query_date=None, dies_param=None):
         """
         """
-        username, password = self.getAuthenticationToken()
-        self.options = self.context.portal_epi_data.getEPIOptions(username)
+        self.options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = self.options['descomptar_30'] and 30 or 0
 
 

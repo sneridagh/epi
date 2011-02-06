@@ -53,11 +53,11 @@
          <div tal:attributes="id string:mes-${mes.id}" class="sidebox">
            <div class="boxhead">
               <h4 tal:attributes="onclick string:toggleSetmana('${mes.id}')" >
-                  <a class="month-arrow" tal:condition="mes.mesanterior" tal:attributes="href string:${api.getAppURL()}/vista-mes?query=${mes.mesanterior}"><</a>
+                  <a class="month-arrow" tal:condition="mes.mesanterior" tal:attributes="href string:${api.getAppURL()}/vista-mes?query=${mes.mesanterior}"></a>
                   &nbsp;&nbsp;&nbsp;
                   <span tal:content="string:${mes.monthname} del ${mes.year}"></span>
                   &nbsp;&nbsp;&nbsp;
-                  <a class="month-arrow" tal:condition="mes.messeguent" tal:attributes="href string:${api.getAppURL()}/vista-mes?query=${mes.messeguent}">></a>
+                  <a class="month-arrow" tal:condition="mes.messeguent" tal:attributes="href string:${api.getAppURL()}/vista-mes?query=${mes.messeguent}"></a>
              </h4>
            </div>
 
@@ -151,7 +151,7 @@ tal:content="mes.horesimputables"></span> hores que has d'imputar(<span tal:cont
                    <td class="especials">
 
                    <img tal:repeat="especial dia.especials"  tal:attributes="src string:/images/permisos/${especial.image};
-                                                                             title especial.title" >
+                                                                             title especial.title" />
 
                    </td>
 
@@ -248,5 +248,7 @@ tal:content="mes.horesimputables"></span> hores que has d'imputar(<span tal:cont
 		    <span>Tria un tiquet de la llista</span>
 		</div>
 	</div>
+</div>
+</metal:main>
 </body>
 </html>

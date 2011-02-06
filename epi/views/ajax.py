@@ -51,7 +51,7 @@ class ConsultarPresenciaAJAX(BaseView):
 
         return Response(persones.replace('"True"','true').replace('"False"','false').replace('None',''))
 
-@view_config(name="consultarPresencia", renderer='epi:templates/capcalera.pt')
+@view_config(name="marcarPresencia", renderer='epi:templates/capcalera.pt')
 class MarcarPresenciaAJAX(BaseView):
     """
     """
@@ -124,7 +124,7 @@ class ImputacionsAJAXModificar(BaseView):
     def __call__(self):
         """
         """
-        options = self.epiUtility.getEPIOptions(username)
+        options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = options['descomptar_30'] and 30 or 0
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
 
@@ -203,7 +203,7 @@ class ImputacionsAJAXMoure(BaseView):
     def __call__(self):
         """
         """
-        options = self.epiUtility.getEPIOptions(self.username)
+        options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = options['descomptar_30'] and 30 or 0
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
@@ -234,7 +234,7 @@ class ImputacionsAJAXCopiar(BaseView):
     def __call__(self):
         """
         """
-        options = self.context.portal_epi_data.getEPIOptions(username)
+        options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = options['descomptar_30'] and 30 or 0
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
@@ -265,7 +265,7 @@ class ImputacionsAJAXEsborrar(BaseView):
     def __call__(self):
         """
         """
-        options = self.epiUtility.getEPIOptions(username)
+        options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = options['descomptar_30'] and 30 or 0
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
@@ -338,7 +338,7 @@ class ImputacionsAJAXCrear(BaseView):
     def __call__(self):
         """
         """
-        options = self.epiUtility.getEPIOptions(username)
+        options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = options['descomptar_30'] and 30 or 0
 
         dia=self.request.get('dia',None)

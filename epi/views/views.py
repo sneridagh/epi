@@ -1,8 +1,10 @@
 from epi.views.dashboard import dashboardView
+from epi.views.api import TemplateAPI
+from pyramid.view import view_config
 
-from presencia import Presencia
-from presencia import MOTIUS_PERMISOS as MOTIUS
-from operacions import Operacions,ACTIVITATS
+from epi.presencia import Presencia
+from epi.presencia import MOTIUS_PERMISOS as MOTIUS
+from epi.operacions import Operacions,ACTIVITATS
 import time
 from DateTime import DateTime
 import datetime
@@ -14,7 +16,7 @@ from BTrees.OOBTree import OOBTree
 from urllib2 import URLError
 from copy import deepcopy
 
-@view_config(name='vista-mes', renderer='epi:templates/vista-mes.pt', permission='view')
+
 class MesView(dashboardView):
     """
     """
