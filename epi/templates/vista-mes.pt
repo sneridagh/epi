@@ -1,0 +1,252 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html metal:use-macro="api.masterTemplate.macros['master']">
+<head></head>
+<body>
+    <metal:main fill-slot="main">
+      <div id="main">
+
+        <div metal:use-macro="api.snippets.macros['statusMessage']"/>
+
+		<div id="ajaxWorking"></div>
+		
+<div id="board"
+     tal:define="mes view.getMes();
+                 setmanes mes.setmanes;
+                 ordres view.getOrdres();
+                 activitats view.getActivitats();
+                 tiquets view.getTiquets();">
+         	    <div id="header">
+                     <a id="logo" href="?refresh=1"><img tal:attributes="src string:/images/ernie-${view.presenciaStatus}.jpg"/>
+                     </a>
+                     <ul id="marcatges" tal:define="marcatges view.getMarcatgesDAvui()">
+                       <li class="title">Marcatges d'avui</li>
+                       <li tal:condition="marcatges"
+                           tal:repeat="marcatge marcatges">
+                           <span class="in" tal:content="marcatge.entrada">00:00</span>
+                           <img src="/images/fletxa.jpeg" />
+                           <span tal:condition="marcatge.sortida" class="out" tal:content="marcatge.sortida">99:99</span>
+                           <span tal:condition="not marcatge.sortida" class="out">
+                               <a id="marcar" tal:condition="view.getPresenciaStatus()"
+                                  href="javascript:marcarPresencia()">Marcar Sortida</a>
+                           </span>
+                       </li>
+ 			           <li tal:condition="not view.getPresenciaStatus()">
+ 			               <span class="in"><a id="marcar" href="javascript:marcarPresencia()">Marcar Entrada</a></span>
+ 			           </li>
+                     </ul>
+                     <input type="text" id="consulta" value="Carregant dades ..."/>
+                     <span id="refresh">Clica el logo per refrescar la caché - <a href="/logout">Logout</a></span>
+
+                </div>
+
+                 <div id="menu-vistes">
+                    <ul>
+                       <li class="all-four-rounded-corners"><a tal:attributes="href api.getAppURL()">Vista Setmana</a></li>
+                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-mes">Vista Mes</a></li>
+                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-any">Vista Any</a></li>           
+                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/options">Opcions</a></li>
+                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/manual">Què és l'EPI ?</a></li>
+                    </ul>
+                </div>
+
+         <div tal:attributes="id string:mes-${mes.id}" class="sidebox">
+           <div class="boxhead">
+              <h4 tal:attributes="onclick string:toggleSetmana('${mes.id}')" >
+                  <a class="month-arrow" tal:condition="mes.mesanterior" tal:attributes="href string:${api.getAppURL()}/vista-mes?query=${mes.mesanterior}"><</a>
+                  &nbsp;&nbsp;&nbsp;
+                  <span tal:content="string:${mes.monthname} del ${mes.year}"></span>
+                  &nbsp;&nbsp;&nbsp;
+                  <a class="month-arrow" tal:condition="mes.messeguent" tal:attributes="href string:${api.getAppURL()}/vista-mes?query=${mes.messeguent}">></a>
+             </h4>
+           </div>
+
+           <div class="boxbody">
+             <div class="resum">
+                :: Aquest mes té <span tal:content="mes.horesatreballargeneriques"></span> hores laborals
+                 <tal:block tal:condition="python:mes['horesvacances']!='00:00'">
+                 <br/>
+                 i has fet <span tal:content="mes.horesvacances"></span> hores de vacances::
+                 </tal:block>
+
+
+                ::<br/>
+                :: Has treballat <span tal:content="mes.horestreballades"></span> de les <span tal:content="mes.horesatreballar"></span> hores que s'han de treballar aquest mes::<br/>
+                :: Has imputat <span
+tal:content="mes.horesimputades"></span> de les <span
+tal:content="mes.horesimputables"></span> hores que has d'imputar(<span tal:content="mes.percentatgeimputat"></span>%)::<br/>
+                 <tal:block tal:condition="python:mes['horespermisos']!='00:00'">
+                :: Se t'han aprobat <span tal:content="mes.horespermisos"></span> hores de permisos::<br/>
+                 </tal:block>
+                 <tal:block tal:condition="python:'-' in mes['horespendents']">
+                :: Has treballat <span tal:content="python:mes['horespendents'].replace('-','')"></span> hores de més::<br/>
+                 </tal:block>
+                 <tal:block tal:condition="python:'-' not in mes['horespendents']">
+                :: Et queden <span tal:content="mes.horespendents"></span> hores pendents per fer::<br/>
+                 </tal:block>
+
+             </div>
+
+     <tal:block repeat="setmana setmanes">
+            <div class="titolsetmana" tal:content="string:Setmana del ${setmana.fdow} fins al ${setmana.ldow}">Setmana del x al y</div>
+            <table>
+               <tr class="titols">
+                  <th >Dia
+                  </th>
+                  <th>Marcatges
+                  </th>
+                  <th colspan="3">Imputacions
+                  </th>
+               </tr>
+
+               <tr class="titols">
+                  <td>&nbsp;
+                  </td>
+                  <td class="small treballades">Treballades
+                  </td>
+                  <td class="small aimputar">A imputar
+                  </td>
+                  <td class="small imputades">Imputades
+                  </td>
+                  <td class="small pendents">Pendents
+                  </td>
+
+               </tr>
+
+               <tal:block repeat="dia setmana.dies">
+                 <tr tal:attributes="id string:tr-${dia.data}" tal:define="rindex repeat.dia.index" >
+                    <td tal:attributes="class python:'dia' + ((dia.get('obert','0')=='1' and view.currentDayNumber()!=dia['dia']) and ' obert' or '')" >
+                       <a title="Clica per modificar els marcatges" 
+                          target="_blank" 
+                          tal:attributes="href dia.link" 
+                          tal:content="dia.dia">
+                       </a>
+                    </td>
+
+                    <td>
+                        <div tal:attributes="class python:'big' + ((dia.get('obert','0')=='1' and view.currentDayNumber()!=dia['dia']) and ' obert' or '')">
+                            <span><a  class="treballades" tal:content="dia.total">HH:MM</a></span><br/>
+                        </div>
+                    </td>
+
+                    <td>
+                        <div class="big aimputar">
+                            <span tal:content="dia.aimputar">HH:MM</span><br/>
+                       </div>
+                    </td>
+                    <td>
+                        <div class="big imputades">
+                            <span tal:content="dia.imputades">HH:MM</span><br/>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="big pendents">
+                            <span tal:content="dia.pendents">HH:MM</span><br/>
+                        </div>
+
+                    </td>
+
+                 </tr>
+                 <tr>
+                   <td class="especials">
+
+                   <img tal:repeat="especial dia.especials"  tal:attributes="src string:/images/permisos/${especial.image};
+                                                                             title especial.title" >
+
+                   </td>
+
+                   <td colspan="4" class="imputacions">
+
+                     <ul tal:attributes="id string:imputacions-${dia.data}" class="llistaimputacions">
+                        <span class="noimputacions" tal:condition="not dia.imputacions">No hi ha imputacions</span>
+                        <tal:block repeat="imputacio dia.imputacions">
+
+
+                          <li tal:define="odd repeat.imputacio.odd"
+                              tal:attributes="class python: 'imputacio %s' % (odd and 'odd' or '')">
+                            <div class="amount">
+                              <div tal:attributes="id string:iid-${imputacio.iid};
+                                                   imptype imputacio.type">
+                                  <span tal:content="imputacio.amount"></span>
+                              </div>
+                            </div>
+                            <div class="concepte">
+                             <a tal:attributes="href string:https://maul.upc.es:8444/imputacions/control/imputacioDetall?timeEntryId=${imputacio.iid}"
+                                tal:content="string:${imputacio.type} - ${imputacio.ref}"
+                                target="_blank"></a>
+                            </div>
+                            <div class="accions">
+                                <img title="Clica per modifiar la imputació i afegir comentaris" tal:attributes="onclick string:toggleModificarImputacio('iid-${imputacio.iid}')" src="/images/pencil.gif"/>
+                                <img title="Clica per esborrar la imputació" tal:attributes="onclick string:esborrarImputacio(this,'${dia.data}','${imputacio.iid}')" src="/images/esborrar.gif"/>
+                            </div>
+
+                          </li>
+                        </tal:block>
+                     </ul>
+                   <div  class="toggle_imputacions">
+                      <span tal:attributes="onclick string:toggleNovesImputacions('${dia.data}')">Nova imputació</span>
+                   </div>
+
+                  <div tal:attributes="id string:ni-${dia.data}" class="novesimputacions">
+                         <div class="imputar" tal:attributes="id string:novaimputacioordre-${dia.data}">
+                           <span class="tipusimputacio">[ORDRE]</span>  <input type="text" id="hores" name="hores" value='' maxlength="2" />
+                           : <input type="text" id="minuts" name="minuts" value='' maxlength="2" />
+                           a <select id="seleccio" name="seleccio">
+                               <tal:block repeat="ordre ordres">
+                                 <option tal:content="ordre.title"
+                                         tal:attributes="value string:${ordre.orderId},${ordre.orderItemSeqId}">
+                                 Opcio</option>
+                               </tal:block>
+                             </select>
+                             <input type="button" value="Imputar" class="btn" tal:attributes="onclick string:imputarAjax('${dia.data}','ordre')"/>
+                         </div>
+
+                         <div class="imputar" tal:attributes="id string:novaimputacioactivitat-${dia.data}">
+                           <span class="tipusimputacio">[ACTIVITAT]</span>   <input type="text" id="hores" name="hores" value='' maxlength="2" />
+                           : <input type="text" id="minuts" name="minuts" value='' maxlength="2" />
+                           a <select id="seleccio" name="seleccio">
+                               <tal:block repeat="activitat activitats">
+                                 <option tal:content="activitat.title"
+                                         tal:attributes="value activitat.activitatId">
+                                 Opcio</option>
+                               </tal:block>
+                             </select>
+                             <input type="button" value="Imputar" class="btn" tal:attributes="onclick string:imputarAjax('${dia.data}','activitat')"/>
+                         </div>
+
+                         <div class="imputar" tal:attributes="id string:novaimputaciotiquet-${dia.data}">
+                           <span class="tipusimputacio">[TIQUETS]</span>   <input type="text" id="hores" name="hores" value='' maxlength="2" />
+                           : <input type="text" id="minuts" name="minuts" value='' maxlength="2" />
+                           a <select id="seleccio" name="seleccio">
+                               <tal:block repeat="tiquet tiquets">
+                                 <option tal:content="tiquet.title"
+                                         tal:attributes="value tiquet.requirementId;
+                                                         class python:tiquet['requirementId']=='0' and 'section' or ''">
+                                 Opcio</option>
+                               </tal:block>
+                             </select>
+                             <input type="button" value="Imputar" class="btn" tal:attributes="onclick string:imputarAjax('${dia.data}','tiquet')"/>
+                         </div>
+
+                   </div>
+                   </td>
+                 </tr>
+               </tal:block>
+            </table>
+     </tal:block>
+           </div>
+
+           <div class="boxfoot">
+              <span>&nbsp;</span>
+           </div>
+         </div>
+
+</div>
+	<div style="display: none;">
+		<div id="imputatiquet" style="width:400px;height:100px;overflow:auto;">
+		    <h2>Imputar a tiquet</h2>
+		    <span>Tria un tiquet de la llista</span>
+		</div>
+	</div>
+</body>
+</html>
