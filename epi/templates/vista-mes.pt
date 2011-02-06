@@ -16,39 +16,39 @@
                  ordres view.getOrdres();
                  activitats view.getActivitats();
                  tiquets view.getTiquets();">
-         	    <div id="header">
-                     <a id="logo" href="?refresh=1"><img tal:attributes="src string:/images/ernie-${view.presenciaStatus}.jpg"/>
-                     </a>
-                     <ul id="marcatges" tal:define="marcatges view.getMarcatgesDAvui()">
-                       <li class="title">Marcatges d'avui</li>
-                       <li tal:condition="marcatges"
-                           tal:repeat="marcatge marcatges">
-                           <span class="in" tal:content="marcatge.entrada">00:00</span>
-                           <img src="/images/fletxa.jpeg" />
-                           <span tal:condition="marcatge.sortida" class="out" tal:content="marcatge.sortida">99:99</span>
-                           <span tal:condition="not marcatge.sortida" class="out">
-                               <a id="marcar" tal:condition="view.getPresenciaStatus()"
-                                  href="javascript:marcarPresencia()">Marcar Sortida</a>
-                           </span>
-                       </li>
- 			           <li tal:condition="not view.getPresenciaStatus()">
- 			               <span class="in"><a id="marcar" href="javascript:marcarPresencia()">Marcar Entrada</a></span>
- 			           </li>
-                     </ul>
-                     <input type="text" id="consulta" value="Carregant dades ..."/>
-                     <span id="refresh">Clica el logo per refrescar la caché - <a href="/logout">Logout</a></span>
+ 	    <div id="header">
+             <a id="logo" href="?refresh=1"><img tal:attributes="src string:/images/ernie-${view.presenciaStatus}.jpg"/>
+             </a>
+             <ul id="marcatges" tal:define="marcatges view.getMarcatgesDAvui()">
+               <li class="title">Marcatges d'avui</li>
+               <li tal:condition="marcatges"
+                   tal:repeat="marcatge marcatges">
+                   <span class="in" tal:content="marcatge.entrada">00:00</span>
+                   <img src="/images/fletxa.jpeg" />
+                   <span tal:condition="marcatge.sortida" class="out" tal:content="marcatge.sortida">99:99</span>
+                   <span tal:condition="not marcatge.sortida" class="out">
+                       <a id="marcar" tal:condition="view.getPresenciaStatus()"
+                          href="javascript:marcarPresencia()">Marcar Sortida</a>
+                   </span>
+               </li>
+		           <li tal:condition="not view.getPresenciaStatus()">
+		               <span class="in"><a id="marcar" href="javascript:marcarPresencia()">Marcar Entrada</a></span>
+		           </li>
+             </ul>
+             <input type="text" id="consulta" value="Carregant dades ..."/>
+             <span id="refresh">Clica el logo per refrescar la caché - <a href="/logout">Logout</a></span>
 
-                </div>
+         </div>
 
-                 <div id="menu-vistes">
-                    <ul>
-                       <li class="all-four-rounded-corners"><a tal:attributes="href api.getAppURL()">Vista Setmana</a></li>
-                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-mes">Vista Mes</a></li>
-                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-any">Vista Any</a></li>           
-                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/options">Opcions</a></li>
-                       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/manual">Què és l'EPI ?</a></li>
-                    </ul>
-                </div>
+         <div id="menu-vistes">
+            <ul>
+               <li class="all-four-rounded-corners"><a tal:attributes="href api.getAppURL()">Vista Setmana</a></li>
+               <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-mes">Vista Mes</a></li>
+               <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-any">Vista Any</a></li>           
+               <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/options">Opcions</a></li>
+               <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/manual">Què és l'EPI ?</a></li>
+            </ul>
+        </div>
 
          <div tal:attributes="id string:mes-${mes.id}" class="sidebox">
            <div class="boxhead">

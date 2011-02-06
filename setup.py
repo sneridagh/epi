@@ -18,8 +18,6 @@ requires = [
     'mechanize',
     'BeautifulSoup',
     'pyramid_beaker',
-    'plone.memoize',
-    'zope.app.cache',
     'DateTime',
     ]
 

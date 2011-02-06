@@ -22,7 +22,7 @@ EPI_OPTIONS_TYPES = dict(descomptar_30='bool',
                    hores_diaries='int',
                    dies_setmana='int'
                    )
-MONTH_NAMES = dict(January='Gener',February='Febrer',March='Març',April='Abril',May='Maig',June='Juny',July='Juliol',August='Agost',September='Setembre',October='Octubre',November='Novembre',December='Desembre')
+MONTH_NAMES = dict(January=u'Gener',February=u'Febrer',March=u'Març',April=u'Abril',May=u'Maig',June=u'Juny',July=u'Juliol',August=u'Agost',September=u'Setembre',October=u'Octubre',November=u'Novembre',December=u'Desembre')
 
 
 def main(global_config, **settings):

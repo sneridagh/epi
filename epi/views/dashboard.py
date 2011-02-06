@@ -102,6 +102,7 @@ class BaseView(object):
         """
         return [dict(title=a,image=MOTIUS[a]['imatge']) for a in MOTIUS.keys()]
 
+@view_config(name='vista-any', renderer='epi:templates/vista-any.pt', permission='view')
 @view_config(name='vista-mes', renderer='epi:templates/vista-mes.pt', permission='view')
 @view_config(context=Root, renderer='epi:templates/dashboard.pt', permission='view')
 class dashboardView(BaseView):
@@ -617,3 +618,63 @@ class dashboardView(BaseView):
             return True
         else:
             return False
+
+    def getAny(self,query_year=None):
+        """
+        """
+
+        hores_s = ['horesatreballargeneriques','horesatreballar','horestreballades','horesimputables','horesimputades','horespendents','horesvacances','horespermisos']
+        query = self.request.get('query',query_year)
+        start_date = query==None and ('01','01',self.now[2]) or tuple(query.split('-')[::-1])
+        year = start_date[2]
+        start_month = int(start_date[1])
+        start_day = start_date[0]
+
+        fdom = DateTime('%s-01-01' % (year))
+        fdom_dow = fdom.dow()==0 and 7 or fdom.dow()
+        fdow = addDays(fdom,(fdom_dow*-1)+1)
+
+        needHistoric = self.needHistoric(self.now,DateTimeToTT(fdom))
+        dies = self.getDies(needHistoric,first_day=fdom,last_day=lastDayOfYear(fdom))
+
+
+        mesos = []
+
+        #inicialitzar totes les variables d'hores a 0
+        totals = {}
+        for hs in hores_s:
+            totals[hs]='00:00'
+
+        for nummonth in range(1,13):
+            startday = start_month==nummonth and start_day or '01'
+            query_date = '%s-%02d-%s' % (year,nummonth,startday)
+            print query_date
+            newneedHistoric = self.needHistoric(self.now,DateTimeToTT(DateTime(query_date)))
+            if newneedHistoric!=needHistoric:
+                needHistoric = newneedHistoric
+                dtq = DateTime(query_date)
+                dies = self.getDies(needHistoric,first_day=dtq,last_day=lastDayOfYear(dtq))
+            mes = self.getMes(query_date=query_date,dies_param=dies)
+
+            if nummonth<start_month:
+                # incialitzar les varibles d'hores del mes a 0 si estem filtrant
+                for hs in hores_s:
+                    mes[hs]='00:00'                                                          
+
+            mes['query_date']=query_date
+
+            # suma totes les variables d'hores de cada mes als totals
+            for hs in hores_s:
+                totals[hs]=sumaHM(totals[hs],mes[hs])
+
+            mesos.append(mes)
+
+        totals['horespendents']=MinutsAHM(HMaMinuts(totals['horesatreballar'])-HMaMinuts(totals['horestreballades']))
+
+        minutsvacances = HMaMinuts(totals['horesvacances'])
+        diesvacances = minutsvacances/(7*60)
+        restahoresvacances = (minutsvacances - (diesvacances*7*60))/60
+        totals['dv']=diesvacances
+        totals['hv']=restahoresvacances
+
+        return dict(title=year,mesos=mesos,totals=totals)
