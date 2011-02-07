@@ -476,7 +476,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 
@@ -508,7 +508,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         return exitcode
 
     def getCodiImputacio(self,data,minuts,ref,tipus):
@@ -521,7 +521,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         
         imputacions = self.obtenirImputacions(di=data,df=data)
 
@@ -582,7 +582,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return dict(hores=hores,
                     minuts=minuts.rjust(2,'0'),
@@ -624,7 +624,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return dict(hores=hores,
                     minuts=minuts.rjust(2,'0'),
@@ -653,7 +653,7 @@ class Operacions(object):
             # Invalidem la cache
             # getUtility(IRAMCache).invalidate('obtenirImputacions')
             day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-            region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+            region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
             self.saveSessionData()
         else:
             code = "No sha pogut imputar al dia %s. Refresca lepi i mou la imputacio manualment arrossegant-la al dia %s" % (novadata,novadata)
@@ -684,7 +684,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 
@@ -706,7 +706,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 

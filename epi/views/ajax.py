@@ -252,7 +252,7 @@ class ImputacionsAJAXCopiar(BaseView):
         operacions.closeBrowser()
         return Response('OK')
 
-@view_config(name="esborrarImputacio")
+@view_config(name="esborrarImputacio", renderer='json')
 class ImputacionsAJAXEsborrar(BaseView):
     """
     """
@@ -270,20 +270,20 @@ class ImputacionsAJAXEsborrar(BaseView):
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
 
-        dia=self.request.get('dia',None)
-        hores=self.request.get('hores','').replace(' ','')
+        dia=self.request.params.get('dia',None)
+        hores=self.request.params.get('hores','').replace(' ','')
         hores = hores=='' and '0' or hores
-        minuts=self.request.get('minuts','').replace(' ','')
+        minuts=self.request.params.get('minuts','').replace(' ','')
         minuts = minuts=='' and '0' or minuts
 
-        iid=self.request.get('iid',None)
+        iid=self.request.params.get('iid',None)
 
         year,month,day = time.strptime(dia,'%d%m%Y')[0:3]
         year = year.__str__()
         month = month.__str__().rjust(2,'0')
         day = day.__str__().rjust(2,'0')
 
-        marcadors = self.epiUtility.recoverMarcadors(username)
+        marcadors = self.epiUtility.recoverMarcadors(self.request, self.username)
 
         data_marcador = (day,month,year)
         #Si estem imputant en un dia que encara no hem fitxat,
@@ -320,12 +320,12 @@ class ImputacionsAJAXEsborrar(BaseView):
            marcadors[data_marcador]=marcador
            resultat['hores']=hores
            resultat['minuts']=minuts.rjust(2,'0')
-           marcadors = self.epiUtility.saveMarcadors(username,marcadors)
+           marcadors = self.epiUtility.saveMarcadors(self.request, self.username, marcadors)
 
         operacions.closeBrowser()
-        return Response(resultat.__str__().replace("'",'"'))
+        return resultat
 
-@view_config(name="crearImputacio")
+@view_config(name="crearImputacio", renderer='json')
 class ImputacionsAJAXCrear(BaseView):
     """
     """
@@ -341,13 +341,13 @@ class ImputacionsAJAXCrear(BaseView):
         options = self.epiUtility.getEPIOptions(self.request, self.username)
         self.descompte_descans = options['descomptar_30'] and 30 or 0
 
-        dia=self.request.get('dia',None)
-        hores=self.request.get('hores',None).replace(' ','')
+        dia=self.request.params.get('dia',None)
+        hores=self.request.params.get('hores',None).replace(' ','')
         hores = hores=='' and '0' or hores
-        minuts=self.request.get('minuts',None).replace(' ','')
+        minuts=self.request.params.get('minuts',None).replace(' ','')
         minuts = minuts=='' and '0' or minuts
-        opcio=self.request.get('opcio',None)
-        tipus=self.request.get('tipus',None)
+        opcio=self.request.params.get('opcio',None)
+        tipus=self.request.params.get('tipus',None)
 
         year,month,day = time.strptime(dia,'%d%m%Y')[0:3]
         year = year.__str__()
@@ -356,7 +356,7 @@ class ImputacionsAJAXCrear(BaseView):
 
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
-        marcadors = self.epiUtility.recoverMarcadors(username)
+        marcadors = self.epiUtility.recoverMarcadors(self.request, self.username)
 
         data_marcador = (day,month,year)
         #Si estem imputant en un dia que encara no hem fitxat,
@@ -404,8 +404,8 @@ class ImputacionsAJAXCrear(BaseView):
         #Si hem pogut imputar, guardem el nou marcador
         if resultat['confirm']=='ok':
            marcadors[data_marcador]=marcador
-           marcadors = self.epiUtility.saveMarcadors(username,marcadors)
-        return Response(resultat.__str__().replace("'",'"'))
+           marcadors = self.epiUtility.saveMarcadors(self.request, self.username, marcadors)
+        return resultat
 
 @view_config(name="comentariImputacio")
 class ComentariImputacio(BaseView):
