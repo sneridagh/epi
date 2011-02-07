@@ -111,7 +111,7 @@ class MarcarPresenciaAJAX(BaseView):
         presencia.closeBrowser()
         return Response('OK')
 
-@view_config(name="modificarTempsImputacio")
+@view_config(name="modificarTempsImputacio", renderer='json')
 class ImputacionsAJAXModificar(BaseView):
     """
     """
@@ -128,25 +128,25 @@ class ImputacionsAJAXModificar(BaseView):
         self.descompte_descans = options['descomptar_30'] and 30 or 0
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
 
-        dia=self.request.get('dia',None)
-        hores=self.request.get('hores','').replace(' ','')
+        dia=self.request.params.get('dia',None)
+        hores=self.request.params.get('hores','').replace(' ','')
         hores = hores=='' and '0' or hores
-        minuts=self.request.get('minuts','').replace(' ','')
+        minuts=self.request.params.get('minuts','').replace(' ','')
         minuts = minuts=='' and '0' or minuts
-        horesold=self.request.get('horesold','').replace(' ','')
+        horesold=self.request.params.get('horesold','').replace(' ','')
         horesold = horesold=='' and '0' or horesold
-        minutsold=self.request.get('minutsold','').replace(' ','')
+        minutsold=self.request.params.get('minutsold','').replace(' ','')
         minutsold = minutsold=='' and '0' or minutsold
-        comentari = self.request.get('comentari','').decode('utf-8').encode('iso-8859-1')
+        comentari = self.request.params.get('comentari','').encode('iso-8859-1')
 
-        iid=self.request.get('iid',None)
+        iid=self.request.params.get('iid',None)
 
         year,month,day = time.strptime(dia,'%d%m%Y')[0:3]
         year = year.__str__()
         month = month.__str__().rjust(2,'0')
         day = day.__str__().rjust(2,'0')
 
-        marcadors = self.epiUtility.recoverMarcadors(username)
+        marcadors = self.epiUtility.recoverMarcadors(self.request, self.username)
 
         data_marcador = (day,month,year)
         #Si estem imputant en un dia que encara no hem fitxat,
@@ -187,8 +187,8 @@ class ImputacionsAJAXModificar(BaseView):
         #Si hem pogut imputar, guardem el nou marcador
         if resultat['confirm']=='ok':
            marcadors[data_marcador]=marcador
-           marcadors = self.epiUtility.saveMarcadors(username,marcadors)
-        return Response(resultat.__str__().replace("'",'"'))
+           marcadors = self.epiUtility.saveMarcadors(self.request, self.username, marcadors)
+        return resultat
 
 @view_config(name="moureImputacio")
 class ImputacionsAJAXMoure(BaseView):
@@ -208,10 +208,10 @@ class ImputacionsAJAXMoure(BaseView):
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
 
-        amount=self.request.get('amount',None)
+        amount=self.request.params.get('amount',None)
         hh,mm=amount.split(':')
-        iid=self.request.get('iid','').split('-')[-1]
-        newdate=self.request.get('newdate','').split('-')[-1]
+        iid=self.request.params.get('iid','').split('-')[-1]
+        newdate=self.request.params.get('newdate','').split('-')[-1]
 
         year,month,day = time.strptime(newdate,'%d%m%Y')[0:3]
         novadata = '%s-%s-%s' % (day,month,year)
@@ -239,10 +239,10 @@ class ImputacionsAJAXCopiar(BaseView):
 
         operacions = Operacions(self.request, self.username, self.password, self.eid, self.tid)
 
-        amount=self.request.get('amount',None)
+        amount=self.request.params.get('amount',None)
         hh,mm=amount.split(':')
-        iid=self.request.get('iid','').split('-')[-1]
-        newdate=self.request.get('newdate','').split('-')[-1]
+        iid=self.request.params.get('iid','').split('-')[-1]
+        newdate=self.request.params.get('newdate','').split('-')[-1]
 
         year,month,day = time.strptime(newdate,'%d%m%Y')[0:3]
         novadata = '%s-%s-%s' % (day,month,year)
@@ -419,7 +419,7 @@ class ComentariImputacio(BaseView):
     def __call__(self):
         """
         """
-        iid = self.request.get('iid','')
+        iid = self.request.params.get('iid','')
         return Response(self.getComentariImputacio(iid))
 
     def getComentariImputacio(self,iid):

@@ -23,7 +23,6 @@ from beaker.cache import cache_region
 
 @view_config(name="prova.html", renderer='epi:templates/mytemplate.pt')
 def unaltre(context, request):
-    # import ipdb; ipdb.set_trace()
     page_title = getHola('svsdf')
     #page_title = "%s Dashboard" % "prova"
     api = TemplateAPI(context, request, page_title)
@@ -48,7 +47,6 @@ class provaView(object):
         return "%s.%s" % (self.__module__, self.__class__.__name__)
     
     def __call__(self):
-        # import ipdb; ipdb.set_trace()
         page_title = self.getHola('svsdf')
         #page_title = "%s Dashboard" % "prova"
         api = TemplateAPI(self.context, self.request, page_title)
@@ -126,7 +124,6 @@ class dashboardView(BaseView):
         self.marcatges_avui = []
         now = DateTime()
         self.now = DateTimeToTT(now)
-        #import ipdb; ipdb.set_trace()
         # if self.request.get('relogin',False):
         #     self.portal_epi_data.sessions=OOBTree()
 

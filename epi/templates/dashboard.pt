@@ -4,7 +4,7 @@
 <head></head>
 <body>
     <metal:main fill-slot="main">
-      <div id="main">
+      <!-- <div id="main"> -->
 
         <div metal:use-macro="api.snippets.macros['statusMessage']"/>
 
@@ -253,7 +253,7 @@
 		         </div>
 		     </tal:block>
       </div>
-    </div>
+    <!-- </div> -->
   </metal:main>
 </body>
 </html>

@@ -19,7 +19,7 @@ $.ajax({
             formatItem: function(row, i, max, term) {
                     restat=''
                     if (row.online)
-                       { restat= '<img src="++resource++epi.core.images/online.gif">  '}
+                       { restat= '<img src="/images/online.gif">  '}
                     else
                        { restat= '<span style="display:none" class="offline"></span>'}
                     rli = restat+"<strong>"+row.nom+"</strong> - <span style='font-size: 80%;'>" + row.equip + "</span><br>"
@@ -227,11 +227,11 @@ $.ajax({
       data+= '<div style="float:left;">'
       data+= '<table>';
       data+= '<tr>'
-      data+= '  <td><img src="++resource++epi.core.images/arrowup.png" onclick="time_inc('+"'h0'"+')"></td>'
-      data+= '  <td><img src="++resource++epi.core.images/arrowup.png" onclick="time_inc('+"'h1'"+')"></td>'
+      data+= '  <td><img src="/images/arrowup.png" onclick="time_inc('+"'h0'"+')"></td>'
+      data+= '  <td><img src="/images/arrowup.png" onclick="time_inc('+"'h1'"+')"></td>'
       data+= '  <td></td>'
-      data+= '  <td><img src="++resource++epi.core.images/arrowup.png" onclick="time_inc('+"'m0'"+')"></td> '
-      data+= '  <td><img src="++resource++epi.core.images/arrowup.png" onclick="time_inc('+"'m1'"+')"></td>  '
+      data+= '  <td><img src="/images/arrowup.png" onclick="time_inc('+"'m0'"+')"></td> '
+      data+= '  <td><img src="/images/arrowup.png" onclick="time_inc('+"'m1'"+')"></td>  '
       data+= '</tr>';
       data+= '<tr>'
       data+= '  <td><input id="h0" name="h0" class="digit" type="text" value="'+h0+'"></td>'
@@ -241,11 +241,11 @@ $.ajax({
       data+= '  <td><input id="m1" name="m1" class="digit" type="text" value="'+m1+'"></td>'
       data+= '</tr>';
       data+= '<tr>'
-      data+= '  <td><img src="++resource++epi.core.images/arrowdown.png" onclick="time_dec('+"'h0'"+')"></td>'
-      data+= '  <td><img src="++resource++epi.core.images/arrowdown.png" onclick="time_dec('+"'h1'"+')"></td>'
+      data+= '  <td><img src="/images/arrowdown.png" onclick="time_dec('+"'h0'"+')"></td>'
+      data+= '  <td><img src="/images/arrowdown.png" onclick="time_dec('+"'h1'"+')"></td>'
       data+= '  <td></td>'
-      data+= '  <td><img src="++resource++epi.core.images/arrowdown.png" onclick="time_dec('+"'m0'"+')"></td> '
-      data+= '  <td><img src="++resource++epi.core.images/arrowdown.png" onclick="time_dec('+"'m1'"+')"></td>  '
+      data+= '  <td><img src="/images/arrowdown.png" onclick="time_dec('+"'m0'"+')"></td> '
+      data+= '  <td><img src="/images/arrowdown.png" onclick="time_dec('+"'m1'"+')"></td>  '
       data+= '</tr>';
       data+= '</table>';
       data+= '</div>'
@@ -385,8 +385,8 @@ $.ajax({
                 newli+='      <a target="_blank" href="https://maul.upc.es:8444/imputacions/control/imputacioDetall?timeEntryId='+iid+'">'+titol+'</a>';
                 newli+='  </div>';
                 newli+='  <div class="accions">';
-                newli+='      <img onclick="toggleModificarImputacio('+"'"+'iid-'+iid+"'"+')" src="++resource++epi.core.images/pencil.gif"/>';
-                newli+='      <img onclick="esborrarImputacio(this,'+"'"+dia+"','"+iid+"'"+')" src="++resource++epi.core.images/esborrar.gif"/>';
+                newli+='      <img onclick="toggleModificarImputacio('+"'"+'iid-'+iid+"'"+')" src="/images/pencil.gif"/>';
+                newli+='      <img onclick="esborrarImputacio(this,'+"'"+dia+"','"+iid+"'"+')" src="/images/esborrar.gif"/>';
                 newli+='  </div>';
                 newli+='</li>';
                 if (lastli.length==0)
