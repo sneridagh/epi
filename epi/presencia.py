@@ -406,7 +406,7 @@ class Presencia(object):
             return (None,None)
 
     ##@reloginIfCrashedAndCache
-    @cache_region('long_term', 'getPresencia')
+    @cache_region('short_term', 'getPresencia')
     @reloginIfCrashed
     def getPresencia(self):
         """

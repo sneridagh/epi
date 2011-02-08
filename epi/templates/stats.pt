@@ -1,15 +1,17 @@
-<html xmlns="http://www.w3.org/2010/xhtml" xml:lang="es-ca"
-      lang="es-ca">
-  <head>
-   <title>UPCNET Board</title>
-
-  </head>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html metal:use-macro="api.masterTemplate.macros['master']">
+<head></head>
 <body>
+    <metal:main fill-slot="main">
+      <!-- <div id="main"> -->
+
+        <div metal:use-macro="api.snippets.macros['statusMessage']"/>
 
 <ul>
-  <li tal:repeat="li view/getStats">
+  <li tal:repeat="li view.getStats()">
     <tal:block condition="python:li['user']!='sep'">
-     <span tal:content="li/user"></span>  <span tal:replace="li/date"></span>
+     <span tal:content="li.user"></span>  <span tal:replace="li.date"></span>
     </tal:block> 
     
     <tal:block condition="python:li['user']=='sep'">
@@ -21,6 +23,6 @@
   
 </ul>
 
-
+</metal:main>
 </body>
 </html>

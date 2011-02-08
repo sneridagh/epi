@@ -16,11 +16,9 @@ from DateTime import DateTime
 from epi.dateutils import *
 from epi import MONTH_NAMES, EPI_OPTIONS, EPI_OPTIONS_TYPES
 
-from zope.app.cache.interfaces.ram import IRAMCache
-from zope.component import getUtility
 from copy import deepcopy
 
-from beaker.cache import cache_region
+from beaker.cache import cache_region, region_invalidate
 
 @view_config(name="prova.html", renderer='epi:templates/mytemplate.pt')
 def unaltre(context, request):
@@ -87,11 +85,11 @@ class BaseView(object):
     def invalidateAll(self):
         """
         """
-        ramcache = getUtility(IRAMCache)
-        ramcache.invalidate('obtenirImputacions')
-        ramcache.invalidate('obtenirPortalTecnic')
-        ramcache.invalidate('getMarcatges')
-        ramcache.invalidate('getPermisos')
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(operacions.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(operacions.obtenirPortalTecnic, None, 'obtenirPortalTecnic', self.username)
+        region_invalidate(presencia.getMarcatges, None, 'getMarcatges', self.username)
+        region_invalidate(presencia.getPermisos, None, 'getPermisos', self.username)
         
     def currentDayNumber(self):
         return '%02d' % DateTime().day()
@@ -729,3 +727,34 @@ class EPIManual(BaseView):
         page_title = "%s Opcions" % self.username
         api = TemplateAPI(self.context, self.request, page_title)
         return dict(api = api)
+
+# Per revisar
+# 
+class EPIStats(BaseView):
+    """
+    """
+    def  __init__(self,context,request):
+        """
+        """
+        super(EPIStats, self).__init__(context,request)
+
+    def __call__(self):
+        """
+        """
+        page_title = "%s Stats" % self.username
+        api = TemplateAPI(self.context, self.request, page_title)
+        return dict(api = api)
+
+    def getStats(self):
+        stats = []
+        pua = self.epiUtility
+        stats = [dict(user=user,date=pua.recoverLastAccessed(user)) for user in pua.storage ]
+        sorteds = sorted(stats,key=lambda entry: entry['date'])[::-1]
+        results = []
+        for i in range(0,len(sorteds)):
+            if i>0:
+              if sorteds[i]['date'] and sorteds[i-1]['date']:
+                if sorteds[i]['date'].split(' ')[0]!=sorteds[i-1]['date'].split(' ')[0]:
+                    results.append(dict(user='sep',date=''))
+            results.append(sorteds[i])
+        return results
