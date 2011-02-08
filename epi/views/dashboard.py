@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from pyramid.security import authenticated_userid
+from pyramid.httpexceptions import HTTPFound
 
 from epi.views.api import TemplateAPI
 from pyramid.view import view_config
@@ -13,7 +14,7 @@ import time
 
 from DateTime import DateTime
 from epi.dateutils import *
-from epi import MONTH_NAMES
+from epi import MONTH_NAMES, EPI_OPTIONS, EPI_OPTIONS_TYPES
 
 from zope.app.cache.interfaces.ram import IRAMCache
 from zope.component import getUtility
@@ -675,3 +676,56 @@ class dashboardView(BaseView):
         totals['hv']=restahoresvacances
 
         return dict(title=year,mesos=mesos,totals=totals)
+
+@view_config(name='options', renderer='epi:templates/options.pt', permission='view')
+class EPIOptions(BaseView):
+    """
+    """
+    def __init__(self, context, request):
+        super(EPIOptions, self).__init__(context,request)
+
+    def __call__(self):
+        """
+        """
+        page_title = "%s Opcions" % self.username
+        api = TemplateAPI(self.context, self.request, page_title)
+        
+        if self.request.params.get('form.submitted','0')=='1':
+            options = {}
+            for option in EPI_OPTIONS.keys():
+                options[option]=self.setField(option,EPI_OPTIONS_TYPES[option],EPI_OPTIONS[option])
+            self.epiUtility.setEPIOptions(self.request, self.username, options)
+            return HTTPFound(location=api.getAppURL())
+        else:
+            return dict(api = api)
+
+    def setField(self,option,ftype,default):
+        """
+        """
+        value = self.request.params.get(option,default)
+        if ftype=='bool':
+            return option in self.request.params.keys()
+        if ftype=='int':
+            return int(value)
+        return value
+
+    def getOptions(self):
+        """
+        """
+        pa = self.epiUtility
+        options = pa.getEPIOptions(self.request, self.username)
+        return options
+        
+@view_config(name='manual', renderer='epi:templates/manual.pt', permission='view')
+class EPIManual(BaseView):
+    """
+    """
+    def __init__(self, context, request):
+        super(EPIManual, self).__init__(context,request)
+
+    def __call__(self):
+        """
+        """
+        page_title = "%s Opcions" % self.username
+        api = TemplateAPI(self.context, self.request, page_title)
+        return dict(api = api)

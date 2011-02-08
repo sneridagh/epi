@@ -1,149 +1,135 @@
-<html xmlns="http://www.w3.org/2010/xhtml" xml:lang="es-ca"
-      lang="es-ca"
-      i18n:domain="plone">
-  <head>
-   <title>EPI - Eina Personal d'Imputació</title>
-   <link rel="stylesheet" type="text/css"
-            href="++resource++epi.core.css/epi.css" />
-
-      <script type="text/javascript"
-              src="++resource++epi.core.js/jquery-1.4.2.min.js">
-      </script>
-
-      <script type="text/javascript"
-              src="++resource++epi.core.js/jquery-ui-1.8.5.custom.min.js">
-      </script>
-
-      <script type="text/javascript"
-              src="++resource++epi.core.js/functions.js">
-      </script>
-
-
-  </head>
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE html>
+<html metal:use-macro="api.masterTemplate.macros['master']">
+<head></head>
 <body>
+    <metal:main fill-slot="main">
+    
 <div id="board">
      <div id="header">
-         <a id="logo" href="manual"><img src="++resource++epi.core.images/ernie-down.jpg"/></a>
-
-
+         <a id="logo" href="manual"><img src="/images/ernie-down.jpg"/></a>
      </div>
 
 <div style="float:none;clear:both;"></div>
 
-     <div id="menu-vistes">
-
-        <ul>
-           <li class="all-four-rounded-corners"><a tal:attributes="href context/absolute_url">Vista Setmana</a></li>
-           <li class="all-four-rounded-corners"><a tal:attributes="href string:${context/absolute_url}/vista-mes">Vista Mes</a></li>
-           <li class="all-four-rounded-corners"><a tal:attributes="href string:${context/absolute_url}/vista-any">Vista Any</a></li>           
-           <li class="all-four-rounded-corners"><a tal:attributes="href string:${context/absolute_url}/options">Opcions</a></li>
-           <li class="all-four-rounded-corners"><a tal:attributes="href string:${context/absolute_url}/manual">Què és l'EPI ?</a></li>
-        </ul>
-
-     </div>
+ <div id="menu-vistes">
+    <ul>
+       <li class="all-four-rounded-corners"><a tal:attributes="href api.getAppURL()">Vista Setmana</a></li>
+       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-mes">Vista Mes</a></li>
+       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/vista-any">Vista Any</a></li>           
+       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/options">Opcions</a></li>
+       <li class="all-four-rounded-corners"><a tal:attributes="href string:${api.getAppURL()}/manual">Què és l'EPI ?</a></li>
+    </ul>
+</div>
 
 
 <div class="sidebox">
 
-           <div class="boxhead">
-               <h4>Què és l'EPI ?</h4>
-           </div>
+    <div class="boxhead">
+       <h4>Què és l'EPI ?</h4>
+    </div>
 
-<div class="boxbody">
+    <div class="boxbody">
 
-<h4>Què és l'EPI</h4>
+        <h4>Què és l'EPI</h4>
 
-<p>L'EPI és una aplicació d'agregació de dades que es nodreix del Notes de Presència
-per obtenir els marcatges de l'usuari, i els relaciona amb les imputacions que hi hagin
-al gestor d'operacions. D'aquesta manera es poden veure les imputacions i els marcatges de
-cada dia, i així poder comprovar ràpidament l'estat de les nostres imputacions en relació
-amb el el temps treballat.</p><br/>
-<p>Apart, proporciona una manera centralitzada de fer diverses operacions com fitxar/desfitxar,
-fer noves imputacions i modificar-les.</p>
+            <p>L'EPI és una aplicació d'agregació de dades que es nodreix del Notes de Presència
+            per obtenir els marcatges de l'usuari, i els relaciona amb les imputacions que hi hagin
+            al gestor d'operacions. D'aquesta manera es poden veure les imputacions i els marcatges de
+            cada dia, i així poder comprovar ràpidament l'estat de les nostres imputacions en relació
+            amb el el temps treballat.</p><br/>
+            <p>Apart, proporciona una manera centralitzada de fer diverses operacions com fitxar/desfitxar,
+            fer noves imputacions i modificar-les.</p>
 
-<h4>Que fa ?</h4>
-<ul>
-    <li>Fitxar i desfitxar - A la capçalera es mostren els marcatges del dia actual, així com un enllaç per fitxar/desfitxar. La imatge de l'EPI canvia amb la ma alçada o avall en funció de l'estat a presència</li>
-    <li>Consulta rapida de telèfons i presència. - A la part inferior dreta de la capçalera, hi una una casella on es pot buscar per telèfon, extensio, nom, cognom, equip, qualsevol persona de upcnet, i la paraula clau 'online' per buscar els qui estan fitxats a presència</li>
-    <li>Visualització dels permisos - A sota del número del dia apareixen icones amb els permisos que tenim aprovats per aquell dia, i les festes locals i nacionals.</li>
-    <li>Afegir Noves imputacions - Cada dia de la llista, té un botó "Nova imputació" des d'on podem afegir noves imputacions a aquell dia</li>
-    <li>Imputar en un tiquet directament al dia que necessitem - Només cal que imputem en el dia que volem, i l'EPI ja s'encarrega de canviar la data</li>
-    <li>Imputar en un problema directament al dia que necessitem - Idem dels tiquets</li>
-    <li>Esborrar imputacions - Totes les imputacions de la llista les podem esborrar amb un sol clic amb la icona <img src="++resource++epi.core.images/esborrar.gif"> que te cada una</li>
-    <li>Modificar imputacions - Totes les imputacions es poden modificar directament clicant a la icona <img src="++resource++epi.core.images/pencil.gif">de la imputació.</li>
-    <li>Posar comentaris a les imputacions - A través de la pantalla de modificació, podem canviar el comentari, que per defecte no s'en posa cap.</li>
-    <li>Accedir a la imputació del gestor - Cada imputació té un link directe al gestor per accedir a la imputació.</li>
-    <li>Moure imputacions Drag&amp;Drop - Totes les imputacions es poden canviar de dia només arrossegant-les d'un dia a un altre</li>
-    <li>Tot l'anterior, amb una visualització per setmanes o mensual - Això ens permetrà saber el resum d'hores treballades i imputades a nivell de setmana o mes</li>
-    <li>Una vista anual, amb els resums de les vistes dels mesos concentrades en una sola taula</li>    
-</ul>
+        <h4>Que fa ?</h4>
+            <ul>
+                <li>Fitxar i desfitxar - A la capçalera es mostren els marcatges del dia actual, així com un enllaç per fitxar/desfitxar. La imatge de l'EPI canvia amb la ma alçada o avall en funció de l'estat a presència</li>
+                <li>Consulta rapida de telèfons i presència. - A la part inferior dreta de la capçalera, hi una una casella on es pot buscar per telèfon, extensio, nom, cognom, equip, qualsevol persona de upcnet, i la paraula clau 'online' per buscar els qui estan fitxats a presència</li>
+                <li>Visualització dels permisos - A sota del número del dia apareixen icones amb els permisos que tenim aprovats per aquell dia, i les festes locals i nacionals.</li>
+                <li>Afegir Noves imputacions - Cada dia de la llista, té un botó "Nova imputació" des d'on podem afegir noves imputacions a aquell dia</li>
+                <li>Imputar en un tiquet directament al dia que necessitem - Només cal que imputem en el dia que volem, i l'EPI ja s'encarrega de canviar la data</li>
+                <li>Imputar en un problema directament al dia que necessitem - Idem dels tiquets</li>
+                <li>Esborrar imputacions - Totes les imputacions de la llista les podem esborrar amb un sol clic amb la icona <img src="/images/esborrar.gif" /> que te cada una</li>
+                <li>Modificar imputacions - Totes les imputacions es poden modificar directament clicant a la icona <img src="/images/pencil.gif" />de la imputació.</li>
+                <li>Posar comentaris a les imputacions - A través de la pantalla de modificació, podem canviar el comentari, que per defecte no s'en posa cap.</li>
+                <li>Accedir a la imputació del gestor - Cada imputació té un link directe al gestor per accedir a la imputació.</li>
+                <li>Moure imputacions Drag&amp;Drop - Totes les imputacions es poden canviar de dia només arrossegant-les d'un dia a un altre</li>
+                <li>Tot l'anterior, amb una visualització per setmanes o mensual - Això ens permetrà saber el resum d'hores treballades i imputades a nivell de setmana o mes</li>
+                <li>Una vista anual, amb els resums de les vistes dels mesos concentrades en una sola taula</li>    
+            </ul>
 
-<h4>IMPORTANT! Velocitat de l'EPI i caché</h4>
+        <h4>IMPORTANT! Velocitat de l'EPI i caché</h4>
 
-<p>La velocitat de resposta l'EPI és directament condicionada per la velocitat de
-resposta en aquell moment de les dues aplicacions d'on extreu les dades. És a dir
-que si el gestor i presència van lents per alguna raó, l'EPI també hi anirà. Això
-juntament amb que algunes operacions que fa l'EPI requereixen diverses connexions,
-fa que a vegades l'aplicació pugui ser una mica lenta.</p>
-<br/>
-<p>Per alleujar-ho una mica, hi ha una caché que es renova periòdicament, per accelerar
-una mica la càrrega. Tot hi haver-hi la caché, si fem qualsevol operació amb imputacions
- des de l'epi, la caché s'actualitza el moment. Si fem alguna cosa directament al gestor necessitarem
- invalidar la caché. Per fer això, només cal que cliquem sobre el logo de l'EPI i així veurem les dades actualitzades.
+            <p>La velocitat de resposta l'EPI és directament condicionada per la velocitat de
+            resposta en aquell moment de les dues aplicacions d'on extreu les dades. És a dir
+            que si el gestor i presència van lents per alguna raó, l'EPI també hi anirà. Això
+            juntament amb que algunes operacions que fa l'EPI requereixen diverses connexions,
+            fa que a vegades l'aplicació pugui ser una mica lenta.</p>
+            <br/>
+            <p>Per alleujar-ho una mica, hi ha una caché que es renova periòdicament, per accelerar
+            una mica la càrrega. Tot hi haver-hi la caché, si fem qualsevol operació amb imputacions
+             des de l'epi, la caché s'actualitza el moment. Si fem alguna cosa directament al gestor necessitarem
+             invalidar la caché. Per fer això, només cal que cliquem sobre el logo de l'EPI i així veurem les dades actualitzades.
+            </p>
 
-<h4>Què volen dir els marcadors de temps que té cada dia?</h4>
+        <h4>Què volen dir els marcadors de temps que té cada dia?</h4>
 
-<p>Per cada dia es calculen les variables</p>
-<ul>
-    <li><strong>Hores laborals -</strong> El temps que s'ha de treballar, tenint en compte els dies de festa oficials</li>    
-    <li><strong>Temps a treballar -</strong> El temps REAL que s'ha de treballar cada dia. Es pot configurar a través de les hores setmanals al menú d'opcions. Són les hores laborables, menys els dies de vacances, permisos de malaltia, etc.IMPORTANT! Els permisos del tipus "E/S Fora del lloc de treball es comptabilitzen com a hores fitxades"</li>
-    <li><strong>Temps treballat -</strong> Les hores:minuts que hi han marcades a Presència, sumades als permisos que tenen un temps assignat (p.e. Indisposició)</li>
-    <li><strong>Temps imputable -</strong> Les hores:minuts que s'han d'imputar aquell dia. Si tenim permisos amb temps assignats, aquests es restaran d'aquesta variable. Si tenim configurat el descompte de 30 minuts diaris (per defecte) també es descomptarà aquí.</li>
-    <li><strong>Temps imputat -</strong> Quantitat d'hores:minuts que hi han imputades al gestor d'operacions</li>
-    <li><strong>Percentatge Imputat -</strong> El % imputat calculat respecte les dues variables anteriors</li>    
-    <li><strong>Temps pendent -</strong> Quantitat d'hores:minuts que ens falta per imputar en un dia segons en relació al temps imputable i l'imputat</li>
-</ul>
+            <p>Per cada dia es calculen les variables</p>
 
-<h4>Que no fa l'EPI (encara)</h4>
+            <ul>
+                <li><strong>Hores laborals -</strong> El temps que s'ha de treballar, tenint en compte els dies de festa oficials</li>    
+                <li><strong>Temps a treballar -</strong> El temps REAL que s'ha de treballar cada dia. Es pot configurar a través de les hores setmanals al menú d'opcions. Són les hores laborables, menys els dies de vacances, permisos de malaltia, etc.IMPORTANT! Els permisos del tipus "E/S Fora del lloc de treball es comptabilitzen com a hores fitxades"</li>
+                <li><strong>Temps treballat -</strong> Les hores:minuts que hi han marcades a Presència, sumades als permisos que tenen un temps assignat (p.e. Indisposició)</li>
+                <li><strong>Temps imputable -</strong> Les hores:minuts que s'han d'imputar aquell dia. Si tenim permisos amb temps assignats, aquests es restaran d'aquesta variable. Si tenim configurat el descompte de 30 minuts diaris (per defecte) també es descomptarà aquí.</li>
+                <li><strong>Temps imputat -</strong> Quantitat d'hores:minuts que hi han imputades al gestor d'operacions</li>
+                <li><strong>Percentatge Imputat -</strong> El % imputat calculat respecte les dues variables anteriors</li>    
+                <li><strong>Temps pendent -</strong> Quantitat d'hores:minuts que ens falta per imputar en un dia segons en relació al temps imputable i l'imputat</li>
+            </ul>
 
-<ul>
-  <li>Actualitzar els comptadors setmanals mensuals al afegir/modificar/eliminar imputacions</li>
-  <li>Canviar objecte de la imputació (p.e. moure un temps imputat d'una ordre a un tiquet)</li>
-  <li>A la llista de tiquets on s'ha imputat recentment, mostrar NOMÉS els que no estan tancats</li>
-  <li>Imputar a un tiquet escrivint el numero de tiquet</li>
-  <li>Funció de copiar imputacions amb Drag&Drop</li>
-  <li>Veure els permisos pendents</li>
-  <li>Demanar permisos desde l'epi</li>  
+        <h4>Que no fa l'EPI (encara)</h4>
+
+            <ul>
+              <li>Actualitzar els comptadors setmanals mensuals al afegir/modificar/eliminar imputacions</li>
+              <li>Canviar objecte de la imputació (p.e. moure un temps imputat d'una ordre a un tiquet)</li>
+              <li>A la llista de tiquets on s'ha imputat recentment, mostrar NOMÉS els que no estan tancats</li>
+              <li>Imputar a un tiquet escrivint el numero de tiquet</li>
+              <li>Funció de copiar imputacions amb Drag&amp;Drop</li>
+              <li>Veure els permisos pendents</li>
+              <li>Demanar permisos desde l'epi</li>  
   
-</ul>
+            </ul>
 
-<h4>Detalls sobre afegir, esborrar i modificar imputacions.</h4>
+        <h4>Detalls sobre afegir, esborrar i modificar imputacions.</h4>
 
-<p>Les dues vistes mostren un resum de les hores treballades i imputades, 
-tenint en compte els permisos que no tenen un temps assignat (p.e. Vacances).</p>
+            <p>Les dues vistes mostren un resum de les hores treballades i imputades, 
+            tenint en compte els permisos que no tenen un temps assignat (p.e. Vacances).</p>
 
-<p>En les dues vistes la llista de dies que apareix, cada dia té 3 seccions:</p>
-  <ul>
-    <li>Els comptadors amb les variables explicades anteriorment, que s'actualitzen a l'instant si s'afegeix/modifica/elimina alguna imputació</li>
-    <li>Una llista de les imputacions d'aquell dia, on cada imputació mostra les hores:minut  a on s'ha imputat i si es ordre, tiquet, GPO..., un enllaç a la imputació al gestor, i uns botons per modificar o esborrar la imputació</li>
-    <li>Un botó per fer noves imputacions</li>
-       <ul>
-        <li>Les ordres, tiquets i problemes són les que apareixen al Portal Tècnic del gestor</li>
-        <li>Les activitats són les que hi han actualment al gestor</li>
-        <li>Els tiquets és una llista doble, on apareixen en primer lloc els tiquets que tenim assignats directament, i en segon lloc tiquets on hem imputat recentment</li>
-       </ul>
-  </ul>
+            <p>En les dues vistes la llista de dies que apareix, cada dia té 3 seccions:</p>
+              <ul>
+                <li>Els comptadors amb les variables explicades anteriorment, que s'actualitzen a l'instant si s'afegeix/modifica/elimina alguna imputació</li>
+                <li>Una llista de les imputacions d'aquell dia, on cada imputació mostra les hores:minut  a on s'ha imputat i si es ordre, tiquet, GPO..., un enllaç a la imputació al gestor, i uns botons per modificar o esborrar la imputació</li>
+                <li>Un botó per fer noves imputacions</li>
+                   <ul>
+                    <li>Les ordres, tiquets i problemes són les que apareixen al Portal Tècnic del gestor</li>
+                    <li>Les activitats són les que hi han actualment al gestor</li>
+                    <li>Els tiquets és una llista doble, on apareixen en primer lloc els tiquets que tenim assignats directament, i en segon lloc tiquets on hem imputat recentment</li>
+                   </ul>
+              </ul>
 
 
-<p>Alguna suggerència? <strong>carles.bruguera@upcnet.es<strong></p>
+            <p>Alguna suggerència? <strong>carles.bruguera@upcnet.es</strong></p>
 
-</div>
-           <div class="boxfoot">
-              <span>&nbsp;</span>
-           </div>
+        </div> <!-- El del boxbody -->
 
-</div>
-</div>
+       <div class="boxfoot">
+          <span>&nbsp;</span>
+       </div>
+
+
+</div> <!-- El del sidebox -->
+
+</div> <!-- El del board -->
+</metal:main>
 </body>
 </html>
 
