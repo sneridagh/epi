@@ -48,7 +48,7 @@ def login(context, request):
         credentials = {'login': login, 'password': password}
         
         # authenticate
-        authenticators = filter(None, [plugins.get(name) for name in ['htpasswd']])
+        authenticators = filter(None, [plugins.get(name) for name in ['htpasswd','ldap_auth']])
                                    
         userid = None
         #import ipdb; ipdb.set_trace()

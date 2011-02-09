@@ -87,7 +87,7 @@ class Presencia(object):
         else:
           self.br = Browser()
           self.br.set_handle_equiv(False)
-          self.login(message="Logging-in into presència via regular login")
+          self.login(message=u"Logging-in into presència via regular login")
           return
 
     def log(self, message):
@@ -126,7 +126,7 @@ class Presencia(object):
         """
         Es logueja a presència amb el login tradicional web
         """
-        self.log("Presència Login %s" % message)
+        self.log(u"Presència Login %s" % message)
         self.br.open(LOGIN_URL)
         self.br.select_form(nr=0)
         self.br['Username']=self.username

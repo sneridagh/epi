@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 from time import time
-from plone.memoize.ram import cache
 from DateTime import DateTime
-from plone.memoize.volatile import ATTR,CONTAINER_FACTORY,_marker, DontCache, store_on_self
-from plone.memoize.interfaces import ICacheChooser
 from zope import component
 
 # def reloginIfCrashed(fn,self,*args,**kwargs):
