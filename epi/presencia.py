@@ -83,11 +83,11 @@ class Presencia(object):
           for co in self.browser_login:
               ck = Cookie(version=co['version'], name=co['name'], value=co['value'], port=co['port'], port_specified=co['port_specified'], domain=co['domain'], domain_specified=co['domain_specified'], domain_initial_dot=co['domain_initial_dot'], path=co['path'], path_specified=co['path_specified'], secure=co['secure'], expires=co['expires'], discard=co['discard'], comment=co['comment'], comment_url=co['comment_url'], rest=co['rest'])
               cj.set_cookie(ck)
-          print "Logging-in into presència via browser"
+          print "Logging-in into presencia via browser"
         else:
           self.br = Browser()
           self.br.set_handle_equiv(False)
-          self.login(message=u"Logging-in into presència via regular login")
+          self.login(message=u"Logging-in into presencia via regular login")
           return
 
     def log(self, message):
@@ -122,11 +122,11 @@ class Presencia(object):
         self.epitool.saveBrowserSession(self.request, self.username,self.getBrowserSession(),'presencia')
         return
 
-    def login(self,message = "Logging-in into presència via regular login"):
+    def login(self,message = "Logging-in into presencia via regular login"):
         """
         Es logueja a presència amb el login tradicional web
         """
-        self.log(u"Presència Login %s" % message)
+        self.log(u"Presencia Login %s" % message)
         self.br.open(LOGIN_URL)
         self.br.select_form(nr=0)
         self.br['Username']=self.username
@@ -511,7 +511,7 @@ class Presencia(object):
             table ='(hh:mm)' in tables[2].__str__() and tables[2] or tables[1]
         except:
           #La sessio del browser ha caducat, per tant refarem el login
-            self.login(message="Re-Logging-in into presència via regular login")
+            self.login(message="Re-Logging-in into presencia via regular login")
             permisos = self.br.open(PERMISOS_URL)
             permisos_html = permisos.read()
             permisos.close()
@@ -627,3 +627,6 @@ class Presencia(object):
                     to_date = (td[1],td[0],td[2]),
                     minutes = minutes)
 
+    def invalidaCaches(self):
+        region_invalidate(self.getMarcatges, None, 'getMarcatges', self.username)
+        region_invalidate(self.getPermisos, None, 'getPermisos', self.username)

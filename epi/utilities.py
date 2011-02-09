@@ -8,6 +8,11 @@ class EPIUtility(object):
     """Utility per aconseguir i manipular l'objecte que guarda la informació a la ZODB"""
     implements(IEPIUtility)
 
+    volatile = None
+
+    def __init__(self):
+        self.volatile = OOBTree()
+
     def get_storage(self, request):
         root = request.root
         return root['epiUtility']
@@ -24,24 +29,44 @@ class EPIUtility(object):
     def getUserPassword(self, request, username):
         """
         """
-        persistentobj = self.get_storage(request)
-
-        if persistentobj.storage.has_key(username)>0:
-          if persistentobj.storage[username].has_key('password'):
-            return persistentobj.storage[username]['password']
+        if self.volatile.has_key(username)>0:
+          if self.volatile[username].has_key('password'):
+            return self.volatile[username]['password']
         else:
             return None
 
     def setUserPassword(self, request, username, password):
         """
         """
-        persistentobj = self.get_storage(request)
-        
         userdata = OOBTree()
-        if persistentobj.storage.has_key(username)>0:
-            userdata=persistentobj.storage[username]
+        if self.volatile.has_key(username)>0:
+            userdata=self.volatile[username]
         userdata['password']=password
-        persistentobj.storage[username]=userdata
+        self.volatile[username]=userdata
+
+    # Per debug! Trobar una manera millor
+    # def getUserPassword(self, request, username):
+    #     """
+    #     """
+    #     persistentobj = self.get_storage(request)
+    # 
+    #     if persistentobj.storage.has_key(username)>0:
+    #       if persistentobj.storage[username].has_key('password'):
+    #         return persistentobj.storage[username]['password']
+    #     else:
+    #         return None
+    # 
+    # def setUserPassword(self, request, username, password):
+    #     """
+    #     """
+    #     persistentobj = self.get_storage(request)
+    # 
+    #     userdata = OOBTree()
+    #     if persistentobj.storage.has_key(username)>0:
+    #         userdata=persistentobj.storage[username]
+    #     userdata['password']=password
+    #     persistentobj.storage[username]=userdata
+
 
     def getEPIOptions(self, request, username):
         """

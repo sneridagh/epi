@@ -22,7 +22,7 @@ requires = [
     ]
 
 setup(name='epi',
-      version='0.0',
+      version='1.0RC1',
       description='epi',
       long_description=README + '\n\n' +  CHANGES,
       classifiers=[

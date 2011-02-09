@@ -51,7 +51,7 @@ def reloginIfCrashedBase(fn,self,*args,**kwargs):
     """
     value = fn(self,*args, **kwargs)
     if value=='EXPIRED':
-        message = '%s INFO La funció %s ha fallat per culpa d''una cookie caducada. Refent el login...' % (DateTime().ISO(),fn.__name__)
+        message = '%s INFO La funcio %s ha fallat per culpa d''una cookie caducada. Refent el login...' % (DateTime().ISO(),fn.__name__)
         self.login(message=message)
         value = fn(self,*args, **kwargs)
     return value

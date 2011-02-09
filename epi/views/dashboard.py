@@ -20,42 +20,6 @@ from copy import deepcopy
 
 from beaker.cache import cache_region, region_invalidate
 
-@view_config(name="prova.html", renderer='epi:templates/mytemplate.pt')
-def unaltre(context, request):
-    page_title = getHola('svsdf')
-    #page_title = "%s Dashboard" % "prova"
-    api = TemplateAPI(context, request, page_title)
-    hola = getHola('asd')
-    return dict(api = api, project=page_title, hola=hola)  
-
-@cache_region('default_term', 'paquillo')
-def getHola(param):
-    print param
-    return 'True'
-
-@view_config(name="prova2.html", renderer='epi:templates/mytemplate.pt')
-class provaView(object):
-
-    def  __init__(self,context,request):
-        """
-        """
-        self.context = context
-        self.request = request
-
-    def __str__(self):
-        return "%s.%s" % (self.__module__, self.__class__.__name__)
-    
-    def __call__(self):
-        page_title = self.getHola('svsdf')
-        #page_title = "%s Dashboard" % "prova"
-        api = TemplateAPI(self.context, self.request, page_title)
-        return dict(api = api, project=page_title, hola=self.getHola('asd'))
-    
-    @cache_region('default_term')
-    def getHola(self, param):
-        print param
-        return 'True'
-
 class BaseView(object):
     """ Classe base de totes les vistes
     """
@@ -85,11 +49,13 @@ class BaseView(object):
     def invalidateAll(self):
         """
         """
-        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(operacions.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
-        region_invalidate(operacions.obtenirPortalTecnic, None, 'obtenirPortalTecnic', self.username)
-        region_invalidate(presencia.getMarcatges, None, 'getMarcatges', self.username)
-        region_invalidate(presencia.getPermisos, None, 'getPermisos', self.username)
+        presencia = Presencia(self.request, self.username,self.password)
+        day1, day2 = self.epiUtility.getObtenirImputacionsDays(self.request, self.username)
+        # region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        # region_invalidate(obtenirPortalTecnic, None, 'obtenirPortalTecnic', self.username)
+        # region_invalidate(getMarcatges, None, 'getMarcatges', self.username)
+        # region_invalidate(getPermisos, None, 'getPermisos', self.username)
+        presencia.invalidaCaches()
         
     def currentDayNumber(self):
         return '%02d' % DateTime().day()
@@ -123,21 +89,20 @@ class dashboardView(BaseView):
         self.marcatges_avui = []
         now = DateTime()
         self.now = DateTimeToTT(now)
+        # Perque?
         # if self.request.get('relogin',False):
         #     self.portal_epi_data.sessions=OOBTree()
 
     def __call__(self):
         """
         """
-        
-        # #Esborrem la cache si hem clicat al logo de l'epi
-        # if self.request.get('refresh',False):
-        #     self.invalidateAll()
-        #     self.request.response.redirect(portal_url)
-        #     return
-
         page_title = "%s Dashboard" % self.username
         api = TemplateAPI(self.context, self.request, page_title)
+        #Esborrem la cache si hem clicat al logo de l'epi
+        if self.request.params.get('refresh',False):
+            self.invalidateAll()
+            return HTTPFound(location=api.getAppURL())
+
         return dict(api = api)
 
     def getPreviousMonth(self,actual):
