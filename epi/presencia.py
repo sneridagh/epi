@@ -156,15 +156,14 @@ class Presencia(object):
             return 'EXPIRED'
         persones.close()
         # getUtility(IRAMCache).invalidate('getMarcatges')
-        region_invalidate(getMarcatges, None, 'getMarcatges', self.username)
+        region_invalidate('epi.presencia.getMarcatges', 'long_term', 'getMarcatges', 'epi.presencia.Presencia', self.username)
         # getUtility(IRAMCache).invalidate('getPresencia')
-        region_invalidate(getPresencia, None, 'getPresencia')
+        region_invalidate('epi.presencia.getPermisos', 'default_term', 'getPermisos', 'epi.presencia.Presencia', self.username)
         return True
         print "S'ha canviat l'estat de marcatge"
 
     ##@reloginIfCrashedAndCache
     @cache_region('long_term', 'getMarcatgesHistoric')
-    @reloginIfCrashed
     def getMarcatgesHistoric(self, username, year):
         """
         Recupera la pàgina de marcatges de presència de l'històric anual, on hi ha tot el que no surt a la pagina principal
@@ -407,9 +406,13 @@ class Presencia(object):
 
     ##@reloginIfCrashedAndCache
     # OJO!! Revisar si ok!
-    @reloginIfCrashed
     @cache_region('short_term', 'getPresencia')
     def getPresencia(self):
+        self.log("getPresencia sense cachejar")
+        return self.getPresenciaBase()
+        
+    @reloginIfCrashed    
+    def getPresenciaBase(self):
         """
         Recupera la pàgina de persones de presència, on hi han els telèfons de cadascú i si esta o no presents
         La pàgina no té cap mena de id's ni classes, el parsejat es una mica dur...
@@ -626,12 +629,3 @@ class Presencia(object):
                     from_date = (fd[1],fd[0],fd[2]),
                     to_date = (td[1],td[0],td[2]),
                     minutes = minutes)
-
-    def invalidaCaches(self):
-        # import beaker.util as util
-        # import ipdb; ipdb.set_trace()
-        # namespace = util.func_namespace(self.getMarcatges)
-        # namespace = '%s.getMarcatges' % self.getMarcatges.__module__
-        # kls.__module__, kls.__name__
-        region_invalidate(self.getMarcatges, 'long_term', 'getMarcatges', self.username)
-        region_invalidate(self.getPermisos, 'default_term', 'getPermisos', self.username)

@@ -86,8 +86,6 @@ class BaseView(object):
     def invalidateAll(self):
         """
         """
-        presencia = Presencia(self.request, self.username,self.password)
-        operacions = Operacions(self.request, self.username, self.password)
         day1, day2 = self.epiUtility.getObtenirImputacionsDays(self.request, self.username)
         # Pattern: region_invalidate(nom_funcio referenciada al modul, nom_region, nom_classe a la que pertany la funcio, *parametres)
         # region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
@@ -98,8 +96,6 @@ class BaseView(object):
         region_invalidate('epi.presencia.getMarcatges', 'long_term', 'getMarcatges', 'epi.presencia.Presencia', self.username)
         # region_invalidate(getPermisos, None, 'getPermisos', self.username)
         region_invalidate('epi.presencia.getPermisos', 'default_term', 'getPermisos', 'epi.presencia.Presencia', self.username)
-        # presencia.invalidaCaches()
-        # operacions.invalidaCaches()
         
     def currentDayNumber(self):
         return '%02d' % DateTime().day()

@@ -233,8 +233,12 @@ class Operacions(object):
     #@cache(smartCacheKey)
     #@reloginIfCrashedAndCache
     @cache_region('default_term', 'obtenirPortalTecnic')
-    @reloginIfCrashed
     def obtenirPortalTecnic(self, username):
+        self.log("obtenirPortalTecnic sense cachejar")
+        return self.obtenirPortalTecnicBase(username)
+        
+    @reloginIfCrashed
+    def obtenirPortalTecnicBase(self, username):
         """
         """
         self.reloadExternalLoginKey()
@@ -398,8 +402,12 @@ class Operacions(object):
     #@cache(smartCacheKey)
     #@reloginIfCrashedAndCache
     @cache_region('default_term', 'obtenirImputacions')
+    def obtenirImputacions(self, username, di, df):
+        self.log("obtenirImputacions sense cachejar")
+        return self.obtenirImputacionsBase(username, di, df)
+        
     @reloginIfCrashed
-    def obtenirImputacions(self, username, di=None, df=None):
+    def obtenirImputacionsBase(self, username, di, df):
         """
         """
         #import ipdb; ipdb.set_trace()
@@ -479,7 +487,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 
@@ -511,7 +519,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         return exitcode
 
     def getCodiImputacio(self,data,minuts,ref,tipus):
@@ -524,9 +532,9 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         
-        imputacions = self.obtenirImputacions(di=data,df=data)
+        imputacions = self.obtenirImputacions(self.username, data, data)
 
         tt = tuple(data.split('-'))
         imputacio = None
@@ -585,7 +593,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         self.saveSessionData()
         return dict(hores=hores,
                     minuts=minuts.rjust(2,'0'),
@@ -627,7 +635,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         self.saveSessionData()
         return dict(hores=hores,
                     minuts=minuts.rjust(2,'0'),
@@ -656,7 +664,7 @@ class Operacions(object):
             # Invalidem la cache
             # getUtility(IRAMCache).invalidate('obtenirImputacions')
             day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-            region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+            region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
             self.saveSessionData()
         else:
             code = "No sha pogut imputar al dia %s. Refresca lepi i mou la imputacio manualment arrossegant-la al dia %s" % (novadata,novadata)
@@ -687,7 +695,7 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
 
@@ -709,11 +717,6 @@ class Operacions(object):
         # Invalidem la cache
         # getUtility(IRAMCache).invalidate('obtenirImputacions')
         day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         self.saveSessionData()
         return exitcode
-
-    def invalidaCaches(self):
-        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
-        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
-        region_invalidate(self.obtenirPortalTecnic, None, 'obtenirPortalTecnic', self.username)

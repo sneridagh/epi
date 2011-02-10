@@ -5,7 +5,7 @@
            <li tal:condition="marcatges"
                tal:repeat="marcatge marcatges">
                <span class="in" tal:content="marcatge.entrada">00:00</span>
-               <img src="images/fletxa.jpeg">
+               <img src="/images/fletxa.jpeg" />
                <span tal:condition="marcatge.sortida" class="out" tal:content="marcatge.sortida">99:99</span>
                <span tal:condition="not marcatge.sortida" class="out">
                    <a id="marcar" tal:condition="view.getPresenciaStatus()"

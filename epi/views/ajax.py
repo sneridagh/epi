@@ -5,20 +5,12 @@ from epi.views.dashboard import BaseView
 from epi.presencia import Presencia
 from pyramid.response import Response
 
-from epi.presencia import MOTIUS_PERMISOS as MOTIUS
 from epi.operacions import Operacions,ACTIVITATS
 import time
 from DateTime import DateTime
-import datetime
-import transaction
 from epi.dateutils import *
-from epi import EPI_OPTIONS,EPI_OPTIONS_TYPES,MONTH_NAMES
-from BTrees.OOBTree import OOBTree
 
-from urllib2 import URLError
-from copy import deepcopy
-
-@view_config(name="consultarPresencia")
+@view_config(name="consultarPresencia", renderer='json')
 class ConsultarPresenciaAJAX(BaseView):
     """
     """
@@ -190,7 +182,7 @@ class ImputacionsAJAXModificar(BaseView):
            marcadors = self.epiUtility.saveMarcadors(self.request, self.username, marcadors)
         return resultat
 
-@view_config(name="moureImputacio")
+@view_config(name="moureImputacio", renderer='json')
 class ImputacionsAJAXMoure(BaseView):
     """
     """
@@ -219,9 +211,9 @@ class ImputacionsAJAXMoure(BaseView):
         operacions.canviarImputacio(novadata,hh,mm,iid)
 
         operacions.closeBrowser()
-        return Response('OK')
+        return {}
 
-@view_config(name="copiarImputacio")
+@view_config(name="copiarImputacio", renderer='json')
 class ImputacionsAJAXCopiar(BaseView):
     """
     """
@@ -250,7 +242,7 @@ class ImputacionsAJAXCopiar(BaseView):
         #operacions.canviarImputacio(novadata,hh,mm,iid)
 
         operacions.closeBrowser()
-        return Response('OK')
+        return {}
 
 @view_config(name="esborrarImputacio", renderer='json')
 class ImputacionsAJAXEsborrar(BaseView):
