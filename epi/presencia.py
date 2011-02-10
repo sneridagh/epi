@@ -175,7 +175,6 @@ class Presencia(object):
 
     ##@reloginIfCrashedAndCache
     @cache_region('long_term', 'getMarcatges')
-    @reloginIfCrashed
     def getMarcatges(self, username):
         """
         Recupera la pàgina de marcatges de presència, on hi han els dos ultims mesos de marcatges.
@@ -269,6 +268,7 @@ class Presencia(object):
         else:
           return None
 
+    @reloginIfCrashed
     def getMarcatgesBase(self,URL,**kwargs):
         """
         """
@@ -406,8 +406,9 @@ class Presencia(object):
             return (None,None)
 
     ##@reloginIfCrashedAndCache
-    @cache_region('short_term', 'getPresencia')
+    # OJO!! Revisar si ok!
     @reloginIfCrashed
+    @cache_region('short_term', 'getPresencia')
     def getPresencia(self):
         """
         Recupera la pàgina de persones de presència, on hi han els telèfons de cadascú i si esta o no presents
@@ -476,7 +477,6 @@ class Presencia(object):
 
     #@reloginIfCrashedAndCache
     @cache_region('long_term', 'getPermisosHistoric')
-    @reloginIfCrashed
     def getPermisosHistoric(self, username, year):
         """
         """
@@ -485,13 +485,13 @@ class Presencia(object):
 
     #@reloginIfCrashedAndCache
     @cache_region('default_term', 'getPermisos')
-    @reloginIfCrashed
     def getPermisos(self, username):
         """
         """
         self.log("getPermisos sense cachejar")
         return self.getPermisosBase(PERMISOS_URL)
-
+    
+    @reloginIfCrashed
     def getPermisosBase(self,url,fname='getPermisos'):
         """
         """
@@ -628,5 +628,10 @@ class Presencia(object):
                     minutes = minutes)
 
     def invalidaCaches(self):
-        region_invalidate(self.getMarcatges, None, 'getMarcatges', self.username)
-        region_invalidate(self.getPermisos, None, 'getPermisos', self.username)
+        # import beaker.util as util
+        # import ipdb; ipdb.set_trace()
+        # namespace = util.func_namespace(self.getMarcatges)
+        # namespace = '%s.getMarcatges' % self.getMarcatges.__module__
+        # kls.__module__, kls.__name__
+        region_invalidate(self.getMarcatges, 'long_term', 'getMarcatges', self.username)
+        region_invalidate(self.getPermisos, 'default_term', 'getPermisos', self.username)

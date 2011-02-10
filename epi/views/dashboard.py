@@ -20,6 +20,43 @@ from copy import deepcopy
 
 from beaker.cache import cache_region, region_invalidate
 
+@view_config(name="prova2.html", renderer='epi:templates/mytemplate.pt')
+class provaView(object):
+
+    def  __init__(self,context,request):
+        """
+        """
+        self.context = context
+        self.request = request
+
+    def __str__(self):
+        return "%s.%s" % (self.__module__, self.__class__.__name__)
+    
+    def __call__(self):
+        page_title = self.getHola('svsdf')
+        api = TemplateAPI(self.context, self.request, page_title)
+        #Esborrem la cache si hem clicat al logo de l'epi
+        if self.request.params.get('refresh',False):
+            # region_invalidate(self.getHola, 'default_term', 'asd')
+            self.invalidate()
+            return HTTPFound(location=api.getAppURL()+'/prova2.html')
+            
+        
+        #page_title = "%s Dashboard" % "prova"
+        
+        return dict(api = api, project=page_title, hola=self.getHola('asd'))
+    
+    @cache_region('default_term')
+    def getHola(self, param):
+        print param
+        return 'True'
+
+    def invalidate(self):
+        # Pattern: region_invalidate(nom_funcio referenciada al modul, nom_region, nom_classe a la que pertany la funcio, *parametres)
+        region_invalidate('epi.views.dashboard.getHola', 'default_term', 'epi.views.dashboard.provaView', 'asd')
+        return
+
+
 class BaseView(object):
     """ Classe base de totes les vistes
     """
@@ -50,12 +87,19 @@ class BaseView(object):
         """
         """
         presencia = Presencia(self.request, self.username,self.password)
+        operacions = Operacions(self.request, self.username, self.password)
         day1, day2 = self.epiUtility.getObtenirImputacionsDays(self.request, self.username)
+        # Pattern: region_invalidate(nom_funcio referenciada al modul, nom_region, nom_classe a la que pertany la funcio, *parametres)
         # region_invalidate(obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate('epi.operacions.obtenirImputacions', 'default_term', 'obtenirImputacions', 'epi.operacions.Operacions', self.username, day1, day2)
         # region_invalidate(obtenirPortalTecnic, None, 'obtenirPortalTecnic', self.username)
+        region_invalidate('epi.operacions.obtenirPortalTecnic', 'default_term', 'obtenirPortalTecnic', 'epi.operacions.Operacions', self.username)
         # region_invalidate(getMarcatges, None, 'getMarcatges', self.username)
+        region_invalidate('epi.presencia.getMarcatges', 'long_term', 'getMarcatges', 'epi.presencia.Presencia', self.username)
         # region_invalidate(getPermisos, None, 'getPermisos', self.username)
-        presencia.invalidaCaches()
+        region_invalidate('epi.presencia.getPermisos', 'default_term', 'getPermisos', 'epi.presencia.Presencia', self.username)
+        # presencia.invalidaCaches()
+        # operacions.invalidaCaches()
         
     def currentDayNumber(self):
         return '%02d' % DateTime().day()

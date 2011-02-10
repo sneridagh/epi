@@ -52,6 +52,9 @@ ACTIVITATS = [
 
 class Operacions(object):
 
+    def __str__(self):
+        return "%s.%s" % (self.__module__, self.__class__.__name__)
+
     def __init__(self, request, username, password, eid='', tid=''):
         """
         """
@@ -710,3 +713,7 @@ class Operacions(object):
         self.saveSessionData()
         return exitcode
 
+    def invalidaCaches(self):
+        day1, day2 = self.epitool.getObtenirImputacionsDays(self.request, self.username)
+        region_invalidate(self.obtenirImputacions, None, 'obtenirImputacions', self.username, day1, day2)
+        region_invalidate(self.obtenirPortalTecnic, None, 'obtenirPortalTecnic', self.username)
