@@ -33,7 +33,9 @@
 			           </li>
                     </ul>
                     <input type="text" id="consulta" value="Carregant dades ..."/>
-                    <span id="refresh">Clica el logo per refrescar la caché - <a href="/logout">Logout</a></span>
+                    <span id="refresh">Clica el logo per refrescar la caché - 
+                        <span tal:content="api.authenticatedUser">User</span>&nbsp;-
+                        <a href="/logout">Logout</a></span>
 
             </div>
 
