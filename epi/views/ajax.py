@@ -103,6 +103,14 @@ class MarcarPresenciaAJAX(BaseView):
         presencia.closeBrowser()
         return Response('OK')
 
+    def getPresenciaStatus(self):
+        """
+        """
+        if self.presenciaStatus=='up':
+            return True
+        else:
+            return False
+
 @view_config(name="modificarTempsImputacio", renderer='json')
 class ImputacionsAJAXModificar(BaseView):
     """
