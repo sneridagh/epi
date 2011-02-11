@@ -67,7 +67,7 @@ class MarcarPresenciaAJAX(BaseView):
     def getMarcatges(self):
         """
         """
-        eid,tid = self.epiUtility.getUserCodes(self.username)
+        eid,tid = self.epiUtility.getUserCodes(self.request, self.username)
 
         presencia = Presencia(self.request, self.username, self.password)
 
