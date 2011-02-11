@@ -536,7 +536,7 @@ class Presencia(object):
            # Ens parem a les files on hi han 'collapse.gif' per investigar
            collapse = 'collapse.gif' in str(dia.find('img'))
            if collapse:
-              dlow = dia.__str__().lower()
+              dlow = dia.__str__().lower().decode('utf-8')
               lusername = self.username.replace('.',' ')
 
               # busquem el nom d'usuari a la fila, i si hi és a partir d'ara guardarem permisos
