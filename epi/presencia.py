@@ -121,7 +121,8 @@ class Presencia(object):
         """
         self.epitool.saveBrowserSession(self.request, self.username,self.getBrowserSession(),'presencia')
         return
-
+    
+    @redirect2LoginIfNotPasswdStored
     def login(self,message = "Logging-in into presencia via regular login"):
         """
         Es logueja a presència amb el login tradicional web
@@ -130,11 +131,15 @@ class Presencia(object):
         self.br.open(LOGIN_URL)
         self.br.select_form(nr=0)
         self.br['Username']=self.username
-        self.br['Password']=self.password
+        try:
+            self.br['Password']=self.password
+        except:
+            return 'No passwd stored in memory'
         response = self.br.submit()
         response_html = response.read()
         response.close()
         self.saveSessionData()
+        return "relogin OK"
 
     def checkBrowserExpired(self,html):
         """

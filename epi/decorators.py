@@ -2,6 +2,7 @@
 from time import time
 from DateTime import DateTime
 from zope import component
+from pyramid.httpexceptions import HTTPFound
 
 # def reloginIfCrashed(fn,self,*args,**kwargs):
 #     """
@@ -56,6 +57,14 @@ def reloginIfCrashedBase(fn,self,*args,**kwargs):
         value = fn(self,*args, **kwargs)
     return value
 
+def redirect2LoginIfNotPasswdStored(fn,self,*args,**kwargs):
+    """Mira si el login peta perque no tenim el passwd en memoria (perque hem reiniciat el proces Python per alguna rao)
+    """
+    value = fn(self,*args, **kwargs)
+    if value=='No passwd stored in memory':
+        message = '%s INFO La funcio %s ha fallat per culpa de que no tenim el passwd guardat. Redireccionant a la pagina de login...' % (DateTime().ISO(),fn.__name__)
+        return HTTPFound(location=self.request.application_url + '/login')
+    return value
 
 def reloginIfCrashedAndCache(fn):
     """

@@ -135,7 +135,8 @@ class Operacions(object):
         """
         self.epitool.saveBrowserSession(self.request, self.username,self.getBrowserSession(),'operacions')
         return
-
+    
+    @redirect2LoginIfNotPasswdStored
     def login(self, message = "Logging-in into operacions via regular login"):
         """
         Es logueja a operacions amb el login tradicional web
@@ -146,11 +147,15 @@ class Operacions(object):
         mainpage = self.getOperacionsMainPage()
         self.br.select_form(nr=0)
         self.br['username']=self.username
-        self.br['password']=self.password
+        try:
+            self.br['password']=self.password
+        except:
+            return 'No passwd stored in memory'
         login_response = self.br.submit()
         html = login_response.read()
         self.loadExternalLoginKey(html)
         self.saveSessionData()
+        return "relogin OK"
 
     def checkBrowserExpired(self,html):
         """
