@@ -142,6 +142,8 @@ class dashboardView(BaseView):
         if self.request.params.get('refresh',False):
             self.invalidateAll()
             return HTTPFound(location=api.getAppURL())
+        if self.password==None:
+            return HTTPFound(location=api.getAppURL()+ '/login')
 
         return dict(api = api)
 
