@@ -60,7 +60,7 @@
 		           <div tal:define="rindex repeat.setmana.index" tal:attributes="class python:'boxbody%s' % (rindex==0 and ' ' or ' hidden')">
 		             <div class="resum">
 		                :: Aquesta Setmana té <span tal:content="setmana.horesatreballargeneriques"></span> hores laborals
-		                 <tal:block tal:condition="python:setmana['horesvacances']!='00:00'">
+		                 <tal:block tal:condition="view.horesvacancesNoEs00(setmana)">
 		                 <br/>
 		                 i has fet <span tal:content="setmanahoresvacances"></span> hores de vacances::
 		                 </tal:block>
@@ -71,8 +71,8 @@
 		                :: Has imputat <span
 		tal:content="setmana.horesimputades"></span> de les <span
 		tal:content="setmana.horesimputables"></span> hores que has d'imputar (<span tal:content="setmana.percentatgeimputat"></span>%)::<br/>
-		                 <tal:block tal:condition="python:setmana['horespermisos']!='00:00'">
-		                :: Se t'han aprobat <span tal:content="setmana/horespermisos"></span> hores de permisos::<br/>
+		                 <tal:block tal:condition="view.horespermisosNoEs00(setmana)">
+		                :: Se t'han aprobat <span tal:content="setmana.horespermisos"></span> hores de permisos::<br/>
 		                 </tal:block>
 		                 <tal:block tal:condition="python:'-' in setmana['horespendents']">
 		                :: Has treballat <span tal:content="python:setmana['horespendents'].replace('-','')"></span> hores de més::<br/>

@@ -10,38 +10,38 @@ from copy import deepcopy
 import logging
 from beaker.cache import cache_region, region_invalidate
 
-MOTIUS_PERMISOS = {'Permis sense sou': {'compta_hores':False,'imatge': 'permis.jpg'},
-'Permís per estudis': {'compta_hores':True,'imatge': 'permis.jpg'},
-'Permís per presidents o vocals de les meses electorals': {'compta_hores':True,'imatge': 'permis.jpg'},
-'Permís recuperable': {'compta_hores':False,'imatge': 'permis.jpg'},
-'Hores sindicals': {'compta_hores':True,'imatge': 'permis.jpg'},
-'Trasllat de domicili': {'compta_hores':True,'imatge': 'trasllat.gif'},
-'Vacances': {'compta_hores':False,'imatge': 'vacances.jpg'},
-'Vacances recuperables': {'compta_hores':False,'imatge': 'vacances.jpg'},
-'Vacances/hores compensació horari': {'compta_hores':False,'imatge': 'vacances.jpg'},
-'Hores/Vacances intervencions especials': {'compta_hores':True,'imatge': 'vacances.jpg'},
-'Voluntariat': {'compta_hores':True,'imatge': 'voluntariat.jpg'},
-'Examens prenatals i tècniques de preparació al part': {'compta_hores':True,'imatge': 'fills.png'},
-'Lactància': {'compta_hores':True,'imatge': 'fills.png'},
-'Maternitat/Paternitat': {'compta_hores':True,'imatge': 'fills.png'},
-'Adopció': {'compta_hores':True,'imatge': 'fills.png'},
-'Cura d\'un infant fins 18 mesos': {'compta_hores':True,'imatge': 'fills.png'},
-'Naixement d\'un fill': {'compta_hores':True,'imatge': 'fills.png'},
-'Paternitat': {'compta_hores':True,'imatge': 'fills.png'},
-'Matrimoni': {'compta_hores':True,'imatge': 'matrimoni.jpg'},
-'Visita metge': {'compta_hores':True,'imatge': 'metge.jpg'},
-'Visita mèdica de fills': {'compta_hores':True,'imatge': 'metge.jpg'},
-'Defunció parents fins 2on grau': {'compta_hores':True,'imatge': 'creu.jpg'},
-'Formació': {'compta_hores':True,'imatge': 'formacio.jpg'},
-'Teletreball': {'compta_hores':False,'imatge': 'teletreball.jpg'},
-'E/S fora del lloc de treball': {'compta_hores':True,'imatge': 'esforalloctreball.jpg'},
-'Deures d\'inexcusable compliment': {'compta_hores':True,'imatge': 'deures.jpg'},
-'Examen': {'compta_hores':True,'imatge': 'examen.jpg'},
-'Indisposició': {'compta_hores':True,'imatge': 'indisposicio.jpg'},
-'Malaltia': {'compta_hores':True,'imatge': 'indisposicio.jpg'},
-'Malaltia greu familiar fins 2on grau': {'compta_hores':True,'imatge': 'indisposicio.jpg' },}
+MOTIUS_PERMISOS = {u'Permis sense sou': {'compta_hores':False,'imatge': 'permis.jpg'},
+u'Permís per estudis': {'compta_hores':True,'imatge': 'permis.jpg'},
+u'Permís per presidents o vocals de les meses electorals': {'compta_hores':True,'imatge': 'permis.jpg'},
+u'Permís recuperable': {'compta_hores':False,'imatge': 'permis.jpg'},
+u'Hores sindicals': {'compta_hores':True,'imatge': 'permis.jpg'},
+u'Trasllat de domicili': {'compta_hores':True,'imatge': 'trasllat.gif'},
+u'Vacances': {'compta_hores':False,'imatge': 'vacances.jpg'},
+u'Vacances recuperables': {'compta_hores':False,'imatge': 'vacances.jpg'},
+u'Vacances/hores compensació horari': {'compta_hores':False,'imatge': 'vacances.jpg'},
+u'Hores/Vacances intervencions especials': {'compta_hores':True,'imatge': 'vacances.jpg'},
+u'Voluntariat': {'compta_hores':True,'imatge': 'voluntariat.jpg'},
+u'Examens prenatals i tècniques de preparació al part': {'compta_hores':True,'imatge': 'fills.png'},
+u'Lactància': {'compta_hores':True,'imatge': 'fills.png'},
+u'Maternitat/Paternitat': {'compta_hores':True,'imatge': 'fills.png'},
+u'Adopció': {'compta_hores':True,'imatge': 'fills.png'},
+u'Cura d\'un infant fins 18 mesos': {'compta_hores':True,'imatge': 'fills.png'},
+u'Naixement d\'un fill': {'compta_hores':True,'imatge': 'fills.png'},
+u'Paternitat': {'compta_hores':True,'imatge': 'fills.png'},
+u'Matrimoni': {'compta_hores':True,'imatge': 'matrimoni.jpg'},
+u'Visita metge': {'compta_hores':True,'imatge': 'metge.jpg'},
+u'Visita mèdica de fills': {'compta_hores':True,'imatge': 'metge.jpg'},
+u'Defunció parents fins 2on grau': {'compta_hores':True,'imatge': 'creu.jpg'},
+u'Formació': {'compta_hores':True,'imatge': 'formacio.jpg'},
+u'Teletreball': {'compta_hores':False,'imatge': 'teletreball.jpg'},
+u'E/S fora del lloc de treball': {'compta_hores':True,'imatge': 'esforalloctreball.jpg'},
+u'Deures d\'inexcusable compliment': {'compta_hores':True,'imatge': 'deures.jpg'},
+u'Examen': {'compta_hores':True,'imatge': 'examen.jpg'},
+u'Indisposició': {'compta_hores':True,'imatge': 'indisposicio.jpg'},
+u'Malaltia': {'compta_hores':True,'imatge': 'indisposicio.jpg'},
+u'Malaltia greu familiar fins 2on grau': {'compta_hores':True,'imatge': 'indisposicio.jpg' },}
 
-ALTRES = {'Festa': {'compta_hores':True,'imatge': 'festa.jpg'},}
+ALTRES = {u'Festa': {'compta_hores':True,'imatge': 'festa.jpg'},}
 MOTIUS = deepcopy(MOTIUS_PERMISOS)
 MOTIUS.update(ALTRES)
 
@@ -567,7 +567,7 @@ class Presencia(object):
         Donada la definicio d'un permis, si esta aprovat, genera els seus dies tal com si ens els haguessim trobat en el
         parseig de getMarcatgesBase. Els marcatges seran sempre [] llista buida, doncs els permisos no tenen un marcatge associat
         """
-
+        motiu = motiu.decode('utf-8')
         days = []
         if permis['approved']:
             from_date = TTToDateTime(permis['from_date'])

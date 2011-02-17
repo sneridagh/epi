@@ -388,7 +388,7 @@ class dashboardView(BaseView):
                        percentatgeimputat = percentatgeimputat,
 
                        horespendents = MinutsAHM(minutspendents))
-
+        # import ipdb; ipdb.set_trace()
         return setmana_dict
 
 
@@ -682,6 +682,17 @@ class dashboardView(BaseView):
 
         return dict(title=year,mesos=mesos,totals=totals)
 
+    def horesvacancesNoEs00(self, setmana):
+        if setmana['horesvacances']!='00:00':
+            return True
+        else:
+            return False
+
+    def horespermisosNoEs00(self, setmana):
+        if setmana['horespermisos']!='00:00':
+            return True
+        else:
+            return False
 @view_config(name='options', renderer='epi:templates/options.pt', permission='view')
 class EPIOptions(BaseView):
     """
