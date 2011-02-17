@@ -41,7 +41,7 @@ u'Indisposició': {'compta_hores':True,'imatge': 'indisposicio.jpg'},
 u'Malaltia': {'compta_hores':True,'imatge': 'indisposicio.jpg'},
 u'Malaltia greu familiar fins 2on grau': {'compta_hores':True,'imatge': 'indisposicio.jpg' },}
 
-ALTRES = {u'Festa': {'compta_hores':True,'imatge': 'festa.jpg'},}
+ALTRES = {u'Festa': {'compta_hores':True,'imatge': 'festa.jpg'}, u'(Not Categorized)': {'compta_hores':False,'imatge': 'vacances.jpg'},}
 MOTIUS = deepcopy(MOTIUS_PERMISOS)
 MOTIUS.update(ALTRES)
 
